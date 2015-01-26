@@ -1,20 +1,21 @@
 (ns jubot.adapter.shell
   (:require
-    [jubot.adapter :refer [Adapter]]))
+    [clojure.string :as str]
+    [jubot.adapter :refer :all]))
 
 (def username (or (System/getenv "USER") "anonymous"))
 
 (defn output
-  [{botname :botname} text]
-  (println (str botname ": " text)))
+  [{:keys [botname]} text]
+  (println botname "=>" text))
 
 (defn input
   [this handler-fn]
-  (let [text (read-line)
-        resp (if (not= text "")
-               (handler-fn this text))]
-    (if (string? resp)
-      (output this (str username " " text)))))
+  (let [this (assoc this :from username)]
+    (some->> (read-line)
+             (text-to-bot (:botname this))
+             (handler-fn this)
+             (output this))))
 
 (defrecord ShellAdapter [botname]
   Adapter

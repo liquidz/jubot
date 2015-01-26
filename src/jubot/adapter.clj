@@ -6,6 +6,12 @@
   (start! [this handler-fn])
   (send!  [this text]))
 
+(defn text-to-bot
+  [botname text]
+  (let [prefix (str botname " ")]
+    (if (and (string? text) (.startsWith text prefix))
+      (apply str (drop (count prefix) text)))))
+
 (defn start-adapter
   [adapter handler-fn]
   (binding [*adapter* adapter]

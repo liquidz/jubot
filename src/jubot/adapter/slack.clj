@@ -9,7 +9,6 @@
 
 (def ^:private DEFAULT_PORT 8080)
 
-
 ;{:channel_id "xxxxxxxxx",
 ; :token "xxxxxxxxxxxxxxxxxxxxxxxx",
 ; :channel_name "test",
@@ -25,15 +24,15 @@
 (defn process-request
   [{:keys [this handler params]}]
   ; TODO: token validation
-  ; TODO: botname
-  ;(let [{:keys [token user_name text]} params]
-  ;  )
-
-  (let [resp (handler this params)]
-    (if (string? resp)
-      (json/write-str
-        {:text resp})
-      "")))
+  (let [{:keys [token user_name text]} params
+        this (assoc this :from user_name)
+        botname (:botname this)]
+    (or (some->> text
+                 (text-to-bot botname)
+                 (handler this)
+                 (hash-map :text)
+                 json/write-str)
+        "")))
 
 (defroutes app
   (GET "/" [] "this is jubot slack adapter")
