@@ -8,6 +8,7 @@ Clojure bot framework
 beco -i -c heroku /heroku_login.sh
 beco heroku apps:create
 beco heroku addons:add rediscloud
+beco -c heroku git push heroku master
 ```
 
 ## License
