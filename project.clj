@@ -5,7 +5,8 @@
                  [ring/ring-jetty-adapter "1.3.2"]
                  [ring/ring-devel "1.3.2"]
                  [org.clojure/data.json "0.2.5"]
-                 [com.taoensso/carmine "2.9.0"]]
+                 [com.taoensso/carmine "2.9.0"]
+                 [com.taoensso/timbre "3.3.1"]]
   :uberjar-name "jubot-standalone.jar"
 
   :profiles {:dev {:dependencies

@@ -2,6 +2,7 @@
   (:require
     [clojure.tools.cli :refer [parse-opts]]
     [jubot.adapter :refer :all]
+    [jubot.brain :as brain]
     [jubot.adapter.shell :refer :all]
     [jubot.adapter.slack :refer :all]))
 
@@ -10,7 +11,11 @@
 
 (defn handler
   [this text]
-  (str "hello " text))
+  (let [x (str "hello " (brain/get "foo") " " text)]
+    (brain/set "foo" text)
+    x
+    )
+  )
 
 (def ^:private cli-options
   [["-a" "--adapter ADAPTER_NAME" "Select adapter" :default DEFAULT_ADAPTER]
