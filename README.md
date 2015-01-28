@@ -1,4 +1,5 @@
 # jubot
+[![Circle CI](https://circleci.com/gh/liquidz/jubot.svg?style=svg)](https://circleci.com/gh/liquidz/jubot)
 
 Clojure bot framework
 
