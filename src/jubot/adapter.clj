@@ -6,6 +6,12 @@
   (start! [this handler-fn])
   (send!  [this text]))
 
+(defmacro defadapter
+  [name & body]
+  `(defrecord ~name [~'botname]
+     ~'Adapter
+     ~@body))
+
 (defn text-to-bot
   [botname text]
   (let [prefix (str botname " ")]

@@ -3,18 +3,19 @@
     [clojure.tools.cli :refer [parse-opts]]
     [jubot.adapter :refer :all]
     [jubot.brain :as brain]
-    [jubot.adapter.shell :refer :all]
-    [jubot.adapter.slack :refer :all]))
+    [jubot.adapter.shell :refer [->ShellAdapter]]
+    [jubot.adapter.slack :refer [->SlackAdapter]]))
 
 (def ^:private DEFAULT_ADAPTER "shell")
 (def ^:private DEFAULT_BOTNAME "jubot")
 
 (defn handler
   [this text]
-  (let [x (str "hello " (brain/get "foo") " " text)]
-    (brain/set "foo" text)
-    x
-    )
+  (str "hello " text)
+  ;(let [x (str "hello " (brain/get "foo") " " text)]
+  ;  (brain/set "foo" text)
+  ;  x
+  ;  )
   )
 
 (def ^:private cli-options

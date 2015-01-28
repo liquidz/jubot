@@ -5,25 +5,27 @@
 
 (def username (or (System/getenv "USER") "anonymous"))
 
-(defn output
+(def println* #(apply println %&))
+
+(defn process-output
   [{:keys [botname]} text]
-  (println botname "=>" text))
+  (println* botname "=>" text))
 
-(defn input
-  [this handler-fn]
-  (let [this (assoc this :from username)]
-    (some->> (read-line)
-             (text-to-bot (:botname this))
-             (handler-fn this)
-             (output this))))
+(defn process-input
+  [this handler-fn text]
+  (some->> text
+           (text-to-bot (:botname this))
+           (handler-fn this)
+           (process-output this)))
 
-(defrecord ShellAdapter [botname]
-  Adapter
+(defadapter ShellAdapter
   (start! [this handler-fn]
-    (println "jubot shell adapter started.")
-    (.start (Thread. #(while true (input this handler-fn)))))
+          (println* "this is jubot shell adapter.")
+          (println* (str "bot's name is \"" (:botname this) "\"."))
+          (.start (Thread.  #(while true
+                               (process-input this handler-fn (read-line))))))
   (send! [this text]
-    (output this text)))
+         (process-output this text)))
 
 
 
