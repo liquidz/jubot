@@ -10,21 +10,29 @@
 (defn- handler [_ text] (str "[" text "]"))
 (defn- text [& s] {:text (apply str s)})
 
+(def ^:private test-process-input (partial process-input this))
+
 (facts "process-input should work fine."
   (fact "ignore nil input"
-    (process-input this handler {:text nil}) => "")
+    (test-process-input handler {:text nil}) => "")
+
+
+  (fact "ignore message from slackbot"
+    (test-process-input handler {:text (str botname " foo")
+                        :user_name "slackbot"}) => "")
 
   (fact "ignore message which is not addressed to bot"
-    (process-input this handler {:text "foo"}) => "")
+    (test-process-input handler {:text "foo"}) => "")
 
   (fact "handler function returns nil"
-    (process-input
-      this (constantly nil)
+    (test-process-input
+      (constantly nil)
       {:text (str botname " foo")}) => "")
 
   (fact "handler function returns string"
-    (process-input
-      this handler
-      {:text (str botname " foo")}) => (json/write-str {:text "[foo]"})))
+    (test-process-input
+      handler
+      {:text (str botname " foo")}) => (json/write-str {:text "[foo]"}))
+  )
 
 ;; TODO: output-process

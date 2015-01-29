@@ -9,17 +9,23 @@
 
 (def ^:private DEFAULT_PORT 8080)
 
-;{:channel_id "xxxxxxxxx",
-; :token "xxxxxxxxxxxxxxxxxxxxxxxx",
-; :channel_name "test",
-; :user_id "xxxxxxxxx",
-; :team_id "xxxxxxxxx",
-; :service_id "xxxxxxxxxx",
-; :user_name "slackbot",
-; :team_domain "uochan",
-; :timestamp "1422058599.000004",
-; :text "foo bar"}
+; ------------------------------------------
+; {:channel_id   "xxxxxxxxx",
+;  :token        "xxxxxxxxxxxxxxxxxxxxxxxx",
+;  :channel_name "test",
+;  :user_id      "xxxxxxxxx",
+;  :team_id      "xxxxxxxxx",
+;  :service_id   "xxxxxxxxxx",
+;  :user_name    "slackbot",
+;  :team_domain  "uochan",
+;  :timestamp    "1422058599.000004",
+;  :text         "foo bar"}
+; ------------------------------------------
 
+(defn not-from-slackbot
+  [username text]
+  (if (not= "slackbot" username)
+    text))
 
 (defn process-input
   [this handler-fn params]
@@ -27,6 +33,7 @@
   (let [{:keys [token user_name text]} params
         botname (:botname this)]
     (or (some->> text
+                 (not-from-slackbot user_name)
                  (text-to-bot botname)
                  (handler-fn this)
                  (hash-map :text)
