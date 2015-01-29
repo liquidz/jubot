@@ -8,6 +8,7 @@
     [clojure.data.json      :as json]))
 
 (def ^:private DEFAULT_PORT 8080)
+(def ^:private OUTGOING_TOKEN_KEY "SLACK_OUTGOING_TOKEN")
 
 ; ------------------------------------------
 ; {:channel_id   "xxxxxxxxx",
@@ -22,9 +23,16 @@
 ;  :text         "foo bar"}
 ; ------------------------------------------
 
+(def getenv* #(System/getenv %))
+
 (defn not-from-slackbot
   [username text]
   (if (not= "slackbot" username)
+    text))
+
+(defn valid-outgoing-token
+  [token text]
+  (if (= token (getenv* OUTGOING_TOKEN_KEY))
     text))
 
 (defn process-input
@@ -34,6 +42,7 @@
         botname (:botname this)]
     (or (some->> text
                  (not-from-slackbot user_name)
+                 (valid-outgoing-token token)
                  (text-to-bot botname)
                  (handler-fn this)
                  (hash-map :text)
@@ -58,7 +67,7 @@
   (start! [this handler-fn]
           (run-jetty
             (-> app api (with-adapter this handler-fn))
-            {:port  (Integer. (or (System/getenv "PORT") DEFAULT_PORT))
+            {:port  (Integer. (or (getenv* "PORT") DEFAULT_PORT))
              :join? false}))
   (send! [this text]
          ; FIXME
