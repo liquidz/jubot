@@ -10,7 +10,13 @@
 (def ^:private nil-handler (constantly nil))
 (def ^:private process-input* (partial process-input (->SlackAdapter botname)))
 
-(deftest text-process-input
+(deftest test-not-from-slackbot
+  (are [x y] (= x y)
+       "bar" (not-from-slackbot "foo" "bar")
+       nil   (not-from-slackbot "foo" nil)
+       nil   (not-from-slackbot "slackbot" "bar")))
+
+(deftest test-process-input
   (testing "ignore nil input"
     (is (= "" (process-input* handler {:text nil}))))
 
