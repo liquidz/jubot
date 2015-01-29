@@ -2,27 +2,27 @@
   (:require
     [jubot.adapter.shell :refer :all]
     [conjure.core        :refer [stubbing]]
-    [midje.sweet         :refer :all]))
+    [clojure.test        :refer :all]))
 
 (def ^:private botname "test")
 (def ^:pricate this (->ShellAdapter botname))
 (defn handler [_ text] (str "[" text "]"))
 
-(fact "process-output should work fine."
+(deftest test-process-output
   (stubbing [println* str]
-    (process-output this "foo") => "test=>foo"))
+    (is (= (process-output this "foo") "test=>foo"))))
 
-(facts "process-input should work fine."
-  (fact "ignore nil input"
-    (process-input this handler nil) => nil)
+(deftest test-process-input
+  (testing "ignore nil input"
+    (is (nil? (process-input this handler nil))))
 
-  (fact "ignore message which is not addressed to bot"
-    (process-input this handler "foo") => nil)
+  (testing "ignore message which is not addressed to bot"
+    (is (nil? (process-input this handler "foo"))))
 
-  (fact "handler function returns nil"
-    (process-input this (constantly nil) (str botname " foo")) => nil)
+  (testing "handler function returns nil"
+    (is (nil? (process-input this (constantly nil) (str botname " foo")))))
 
-  (fact "handler function returns string"
+  (testing "handler function returns string"
     (stubbing [process-output #(second %&)]
-      (process-input this handler (str botname " foo")) => "[foo]")))
-
+      (is (= (process-input this handler (str botname " foo"))
+             "[foo]")))))

@@ -10,10 +10,8 @@
   :uberjar-name "jubot-standalone.jar"
 
   :profiles {:dev {:dependencies
-                   [[midje "1.6.3" :exclusions [org.clojure/clojure]]
-                    [ring/ring-mock "0.2.0"]
+                   [[ring/ring-mock "0.2.0"]
                     [org.clojars.runa/conjure "2.2.0"] ]}}
-  :plugins [[lein-midje "3.1.3"]]
 
   ;:aliases {"dev-run" ["run" "-m" "jubot.server/-dev-main"]}
   :min-lein-version "2.0.0"

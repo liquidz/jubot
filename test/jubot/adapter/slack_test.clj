@@ -2,37 +2,30 @@
   (:require
     [jubot.adapter.slack :refer :all]
     [conjure.core        :refer [stubbing]]
-    [midje.sweet         :refer :all]
-    [clojure.data.json   :as json]))
+    [clojure.data.json   :as json]
+    [clojure.test        :refer :all]))
 
 (def ^:private botname "test")
-(def ^:pricate this (->SlackAdapter botname))
-(defn- handler [_ text] (str "[" text "]"))
-(defn- text [& s] {:text (apply str s)})
+(def ^:private handler #(str "[" %2 "]"))
+(def ^:private nil-handler (constantly nil))
+(def ^:private process-input* (partial process-input (->SlackAdapter botname)))
 
-(def ^:private test-process-input (partial process-input this))
+(deftest text-process-input
+  (testing "ignore nil input"
+    (is (= "" (process-input* handler {:text nil}))))
 
-(facts "process-input should work fine."
-  (fact "ignore nil input"
-    (test-process-input handler {:text nil}) => "")
+  (testing "ignore message from slackbot"
+    (is (= "" (process-input*
+                handler {:text (str botname " foo") :user_name "slackbot"}))))
 
+  (testing "ignore message which is not addressed to bot"
+    (is (= "" (process-input* handler {:text "foo"}))))
 
-  (fact "ignore message from slackbot"
-    (test-process-input handler {:text (str botname " foo")
-                        :user_name "slackbot"}) => "")
+  (testing "handler function returns nil"
+    (is (= "" (process-input* nil-handler {:text (str botname " foo")}))))
 
-  (fact "ignore message which is not addressed to bot"
-    (test-process-input handler {:text "foo"}) => "")
+  (testing "handler function returns string"
+    (is (= (json/write-str {:text "[foo]"})
+           (process-input* handler {:text (str botname " foo")})))))
 
-  (fact "handler function returns nil"
-    (test-process-input
-      (constantly nil)
-      {:text (str botname " foo")}) => "")
-
-  (fact "handler function returns string"
-    (test-process-input
-      handler
-      {:text (str botname " foo")}) => (json/write-str {:text "[foo]"}))
-  )
-
-;; TODO: output-process
+;;; TODO: output-process
