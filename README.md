@@ -12,6 +12,12 @@ beco heroku addons:add rediscloud
 beco -c heroku git push heroku master
 ```
 
+### Slack Adapter
+
+```
+beco heroku config:add SLACK_OUTGOING_TOKEN=YOUR_SLACK_OUTGOING_TOKEN
+```
+
 ## License
 
 Copyright (C) 2015 [uochan](http://twitter.com/uochan)

@@ -1,49 +1,33 @@
 (ns jubot.core
   (:require
-    [clojure.tools.cli :refer [parse-opts]]
-    [jubot.adapter :refer :all]
-    [jubot.brain :as brain]
+    [clojure.tools.cli   :refer [parse-opts]]
+    [jubot.adapter       :refer :all]
+    [jubot.brain         :as    brain]
     [jubot.adapter.shell :refer [->ShellAdapter]]
-    [jubot.adapter.slack :refer [->SlackAdapter]]))
+    [jubot.adapter.slack :refer [->SlackAdapter]]
+    [jubot.util.handler  :refer :all]))
 
 (def ^:private DEFAULT_ADAPTER "shell")
 (def ^:private DEFAULT_BOTNAME "jubot")
 
-(defn handler
-  [this text]
-  (str "hello " text)
-  ;(let [x (str "hello " (brain/get "foo") " " text)]
-  ;  (brain/set "foo" text)
-  ;  x
-  ;  )
-  )
-
 (def ^:private cli-options
   [["-a" "--adapter ADAPTER_NAME" "Select adapter" :default DEFAULT_ADAPTER]
-   ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME]
-   ])
+   ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME]])
 
 (defn jubot
-  [handler-fn & args]
-  (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
-        botname (:name options)
-        adapter (case (:adapter options)
-                  "slack" (->SlackAdapter botname)
-                  (->ShellAdapter botname))]
-    (start-adapter adapter handler-fn)))
+  [handler-fn]
+  (fn [& args]
+    (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
+          botname (:name options)
+          adapter (case (:adapter options)
+                    "slack" (->SlackAdapter botname)
+                    (->ShellAdapter botname))]
+      (start-adapter adapter handler-fn))))
 
-(def -main (partial jubot handler))
+(def handler
+  (regexp-handler
+    #"^ping$"            (constantly "pong")
+    #"^set (.+?) (.+?)$" (fn [this [[_ k v]]] (brain/set k v))
+    #"^get (.+?)$"       (fn [this [[_ k]]]   (brain/get k))))
 
-;(defn -main
-;  []
-;  ;(start-adapter (->ShellAdapter "p") handler)
-;  (start-adapter (->SlackAdapter "p") handler)
-;  )
-
-;(defn greeting
-;  []
-;  "Hello, world")
-;
-;(defroutes app
-;  (GET "/" [] (greeting))
-;  (not-found "page not found"))
+(def -main (jubot handler))
