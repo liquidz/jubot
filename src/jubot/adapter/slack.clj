@@ -5,10 +5,12 @@
     [compojure.core         :refer [defroutes GET POST]]
     [compojure.route        :refer [not-found]]
     [compojure.handler      :refer [api]]
-    [clojure.data.json      :as json]))
+    [clojure.data.json      :as    json]
+    [clj-http.lite.client   :as    client]))
 
 (def ^:private DEFAULT_PORT 8080)
 (def ^:private OUTGOING_TOKEN_KEY "SLACK_OUTGOING_TOKEN")
+(def ^:private INCOMING_URL_KEY   "SLACK_INCOMING_URL")
 
 ; ------------------------------------------
 ; {:channel_id   "xxxxxxxxx",
@@ -35,9 +37,16 @@
   (if (= token (getenv* OUTGOING_TOKEN_KEY))
     text))
 
+(defn process-output
+  [this text]
+  (let [url     (getenv* INCOMING_URL_KEY)
+        payload {:text text
+                 :username (:botname this)}]
+    (when url
+      (client/post url {:form-params {:payload (json/write-str payload)}}))))
+
 (defn process-input
   [this handler-fn params]
-  ; TODO: token validation
   (let [{:keys [token user_name text]} params
         botname (:botname this)]
     (or (some->> text
@@ -45,7 +54,7 @@
                  (valid-outgoing-token token)
                  (text-to-bot botname)
                  (handler-fn this)
-                 (hash-map :text)
+                 (hash-map :username botname :text)
                  json/write-str)
         "")))
 
@@ -70,5 +79,4 @@
             {:port  (Integer. (or (getenv* "PORT") DEFAULT_PORT))
              :join? false}))
   (send! [this text]
-         ; FIXME
-         nil))
+         (process-output this text)))

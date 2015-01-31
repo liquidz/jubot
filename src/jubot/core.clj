@@ -28,6 +28,9 @@
   (regexp-handler
     #"^ping$"            (constantly "pong")
     #"^set (.+?) (.+?)$" (fn [this [[_ k v]]] (brain/set k v))
-    #"^get (.+?)$"       (fn [this [[_ k]]]   (brain/get k))))
+    #"^get (.+?)$"       (fn [this [[_ k]]]   (brain/get k))
+    #"^out (.+?)$"       (fn [this [[_ s]]]
+                           (send! this (str "uochan kiteru:" s))
+                           "done")))
 
 (def -main (jubot handler))

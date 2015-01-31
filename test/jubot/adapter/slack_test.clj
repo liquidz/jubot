@@ -1,14 +1,17 @@
 (ns jubot.adapter.slack-test
   (:require
-    [jubot.adapter.slack :refer :all]
-    [conjure.core        :refer [stubbing]]
-    [clojure.data.json   :as json]
-    [clojure.test        :refer :all]))
+    [jubot.adapter.slack  :refer :all]
+    [conjure.core         :refer [stubbing]]
+    [clojure.data.json    :as    json]
+    [clojure.test         :refer :all]
+    [clj-http.lite.client :refer [post]]))
 
 (def ^:private botname "test")
 (def ^:private handler #(str "[" %2 "]"))
 (def ^:private nil-handler (constantly nil))
-(def ^:private process-input* (partial process-input (->SlackAdapter botname)))
+(def ^:private adapter (->SlackAdapter botname))
+(def ^:private process-input* (partial process-input adapter))
+(def ^:private process-output* (partial process-output adapter))
 
 (deftest test-not-from-slackbot
   (are [x y] (= x y)
@@ -45,7 +48,21 @@
     (is (= "" (process-input* nil-handler {:text (str botname " foo")}))))
 
   (testing "handler function returns string"
-    (is (= (json/write-str {:text "[foo]"})
-           (process-input* handler {:text (str botname " foo")})))))
+    (is (= {:username botname :text "[foo]"}
+           (json/read-str
+             (process-input* handler {:text (str botname " foo")})
+             :key-fn keyword)))))
 
-;;; TODO: output-process
+
+(deftest test-process-output
+  (testing "should work fine"
+    (stubbing [getenv* "localhost"
+               post    list]
+      (let [[url {{payload :payload} :form-params}] (process-output* "foo")
+            payload (json/read-str payload :key-fn keyword)]
+        (is (= "localhost" url))
+        (is (= {:username botname :text "foo"} payload)))))
+
+  (testing "INCOMING_URL_KEY is not defined"
+    (stubbing [getenv* nil]
+      (is (nil? (process-output* "foo"))))))

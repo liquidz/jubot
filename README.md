@@ -16,6 +16,7 @@ beco -c heroku git push heroku master
 
 ```
 beco heroku config:add SLACK_OUTGOING_TOKEN=YOUR_SLACK_OUTGOING_TOKEN
+beco heroku config:add SLACK_INCOMING_URL=YOUR_SLACK_INCOMING_URL
 ```
 
 ## License
