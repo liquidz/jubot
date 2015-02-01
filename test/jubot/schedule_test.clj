@@ -22,15 +22,20 @@
          a     b)))
 
 (deftest test-start-schedule!
-  (stubbing [cronj hash-map
-             start! identity]
-    (clear-schedule!)
-    (set-schedule! "foo" (constantly "bar"))
-    (set-schedule! "bar" (constantly "baz"))
+  (testing "with some schedules"
+    (stubbing [cronj hash-map
+               start! identity]
+      (clear-schedule!)
+      (set-schedule! "foo" (constantly "bar"))
+      (set-schedule! "bar" (constantly "baz"))
 
-    (let [[entry _ :as entries] (:entries (start-schedule! "adapter"))]
-      (are [x y] (= x y)
-           2         (count entries)
-           "bar"     ((:handler entry) nil {})
-           "foo"     (:schedule entry)
-           "adapter" (-> entry :opts :adapter)))))
+      (let [[entry _ :as entries] (:entries (start-schedule! "adapter"))]
+        (are [x y] (= x y)
+             2         (count entries)
+             "bar"     ((:handler entry) nil {})
+             "foo"     (:schedule entry)
+             "adapter" (-> entry :opts :adapter)))))
+
+  (testing "without schedule"
+    (is (nil? (do (clear-schedule!)
+                  (start-schedule! "adapter"))))))

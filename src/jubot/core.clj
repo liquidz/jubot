@@ -35,9 +35,9 @@
                            (send! this (str "uochan kiteru:" s))
                            "done")))
 
-(set-schedule!
-  "0 0 * * * * *"
-  (fn [adapter]
-    (send! adapter "KITERU")))
+;(set-schedule!
+;  "0 0 * * * * *"
+;  (fn [adapter]
+;    (send! adapter "KITERU")))
 
 (def -main (jubot handler))
