@@ -5,6 +5,8 @@ Clojure bot framework
 
 ## Usage
 
+[![Clojars Project](http://clojars.org/jubot/latest-version.svg)](http://clojars.org/jubot)
+
 ```
 beco -i -c heroku /heroku_login.sh
 beco heroku apps:create
