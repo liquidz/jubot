@@ -1,6 +1,5 @@
 (ns jubot.adapter.shell
   (:require
-    [clojure.string :as str]
     [jubot.adapter :refer :all]))
 
 (def username (or (System/getenv "USER") "anonymous"))

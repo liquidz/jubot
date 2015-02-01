@@ -2,11 +2,9 @@
   (:require
     [clojure.tools.cli   :refer [parse-opts]]
     [jubot.adapter       :refer :all]
-    [jubot.brain         :as    brain]
-    [jubot.schedule      :refer [set-schedule! start-schedule!]]
+    [jubot.schedule      :refer [start-schedule!]]
     [jubot.adapter.shell :refer [->ShellAdapter]]
-    [jubot.adapter.slack :refer [->SlackAdapter]]
-    [jubot.util.handler  :refer :all]))
+    [jubot.adapter.slack :refer [->SlackAdapter]]))
 
 (def ^:private DEFAULT_ADAPTER "shell")
 (def ^:private DEFAULT_BOTNAME "jubot")
@@ -25,19 +23,3 @@
                     (->ShellAdapter botname))]
       (start-schedule! adapter)
       (start-adapter adapter handler-fn))))
-
-(def handler
-  (regexp-handler
-    #"^ping$"            (constantly "pong")
-    #"^set (.+?) (.+?)$" (fn [this [[_ k v]]] (brain/set k v))
-    #"^get (.+?)$"       (fn [this [[_ k]]]   (brain/get k))
-    #"^out (.+?)$"       (fn [this [[_ s]]]
-                           (send! this (str "uochan kiteru:" s))
-                           "done")))
-
-(set-schedule!
-  "0 0 7 * * * *"
-  (fn [adapter]
-    (send! adapter "7時だよ")))
-
-(def -main (jubot handler))
