@@ -3,6 +3,7 @@
     [clojure.tools.cli   :refer [parse-opts]]
     [jubot.adapter       :refer :all]
     [jubot.brain         :as    brain]
+    [jubot.schedule      :refer [set-schedule! start-schedule!]]
     [jubot.adapter.shell :refer [->ShellAdapter]]
     [jubot.adapter.slack :refer [->SlackAdapter]]
     [jubot.util.handler  :refer :all]))
@@ -22,6 +23,7 @@
           adapter (case (:adapter options)
                     "slack" (->SlackAdapter botname)
                     (->ShellAdapter botname))]
+      (start-schedule! adapter)
       (start-adapter adapter handler-fn))))
 
 (def handler
@@ -32,5 +34,10 @@
     #"^out (.+?)$"       (fn [this [[_ s]]]
                            (send! this (str "uochan kiteru:" s))
                            "done")))
+
+(set-schedule!
+  "0 0 * * * * *"
+  (fn [adapter]
+    (send! adapter "KITERU")))
 
 (def -main (jubot handler))

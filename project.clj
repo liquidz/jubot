@@ -7,7 +7,8 @@
                  [org.clojure/data.json "0.2.5"]
                  [com.taoensso/carmine "2.9.0"]
                  [com.taoensso/timbre "3.3.1"]
-                 [clj-http-lite "0.2.1"]]
+                 [clj-http-lite "0.2.1"]
+                 [im.chit/cronj "1.4.3"]]
   :uberjar-name "jubot-standalone.jar"
 
   :profiles {:dev {:dependencies
