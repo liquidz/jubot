@@ -1,7 +1,7 @@
-(jubot.brain.redis
+(ns jubot.brain.redis
   (:require
     [taoensso.timbre  :as timbre]
-    [taoensso.carmine :as car])
+    [taoensso.carmine :as car]))
 
 (def ^:private DEFAULT_REDIS_URI "redis://localhost:6379/")
 

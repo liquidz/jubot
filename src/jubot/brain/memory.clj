@@ -1,5 +1,4 @@
-(ns jubot.brain.memory
-  )
+(ns jubot.brain.memory)
 
 (def ^:private mem (atom {}))
 
