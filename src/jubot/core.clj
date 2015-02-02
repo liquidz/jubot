@@ -5,7 +5,7 @@
     [jubot.brain         :refer [set-brain!]]
     [jubot.brain.memory  :refer [->MemoryBrain]]
     [jubot.brain.redis   :refer [->RedisBrain]]
-    [jubot.schedule      :refer [start-schedule!]]
+    [jubot.schedule      :refer [start-schedule! start-schedule!*]]
     [jubot.adapter.shell :refer [->ShellAdapter]]
     [jubot.adapter.slack :refer [->SlackAdapter]]
     ))
@@ -20,7 +20,7 @@
    ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME] ])
 
 (defn jubot
-  [& {:keys [handler]}]
+  [& {:keys [handler schedule]}]
   (fn [& args]
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
           botname (:name options)
@@ -31,5 +31,6 @@
                     "redis" (->RedisBrain)
                     (->MemoryBrain))]
       (set-brain! brain)
-      (start-schedule! adapter)
+      ;(start-schedule! adapter)
+      (start-schedule!* adapter schedule)
       (start-adapter adapter handler))))

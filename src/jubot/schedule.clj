@@ -26,3 +26,9 @@
                              @cron-entries)))))
 
 
+(defn start-schedule!*
+  [adapter entries]
+  (when-not (empty? entries)
+    (c/start!
+      (c/cronj :entries (map (partial schedule->task adapter)
+                             entries)))))
