@@ -2,6 +2,8 @@
   (:require
     [clojure.tools.cli   :refer [parse-opts]]
     [jubot.adapter       :refer :all]
+    [jubot.brain :refer [set-brain!]]
+    [jubot.brain.memory :refer [->MemoryBrain]]
     [jubot.schedule      :refer [start-schedule!]]
     [jubot.adapter.shell :refer [->ShellAdapter]]
     [jubot.adapter.slack :refer [->SlackAdapter]]))
@@ -14,12 +16,13 @@
    ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME]])
 
 (defn jubot
-  [handler-fn]
+  [& {:keys [handler]}]
   (fn [& args]
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
           botname (:name options)
           adapter (case (:adapter options)
                     "slack" (->SlackAdapter botname)
                     (->ShellAdapter botname))]
+      (set-brain! (->MemoryBrain))
       (start-schedule! adapter)
-      (start-adapter adapter handler-fn))))
+      (start-adapter adapter handler))))
