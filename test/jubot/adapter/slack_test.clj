@@ -7,7 +7,7 @@
     [clj-http.lite.client :refer [post]]))
 
 (def ^:private botname "test")
-(def ^:private handler #(str "[" %2 "]"))
+(def ^:private handler #(str "[" % "]"))
 (def ^:private nil-handler (constantly nil))
 (def ^:private adapter (->SlackAdapter botname))
 (def ^:private process-input* (partial process-input adapter))

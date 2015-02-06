@@ -14,16 +14,16 @@
   [this handler-fn text]
   (some->> text
            (text-to-bot (:botname this))
-           (handler-fn this)
+           handler-fn
            (process-output this)))
 
 (defadapter ShellAdapter
-  (start! [this handler-fn]
+  (start* [this handler-fn]
           (println* "this is jubot shell adapter.")
           (println* (str "bot's name is \"" (:botname this) "\"."))
           (.start (Thread.  #(while true
                                (process-input this handler-fn (read-line))))))
-  (send! [this text]
+  (send* [this text]
          (process-output this text)))
 
 

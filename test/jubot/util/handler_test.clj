@@ -4,30 +4,26 @@
     [clojure.test :refer :all]))
 
 (def ^:private regexp-handler*
-  (partial
-    (regexp-handler
-      #"^ping$"      (constantly "pong")
-      #"^this$"      (fn [this & _] this)
-      #"^set (.+?)$" (fn [this [[_ x]]] (str "s:" x))
-      #"^get (.+?)$" (fn [this [[_ x]]] (str "g:" x))
-      :else          (constantly "error"))
-    "adapter"))
+  (regexp-handler
+    #"^ping$"      (constantly "pong")
+    #"^set (.+?)$" (fn [[[_ x]]] (str "s:" x))
+    #"^get (.+?)$" (fn [[[_ x]]] (str "g:" x))
+    :else          (constantly "error")))
 
 (deftest test-regexp-handler
   (testing "should work fine"
     (are [x y] (= x (regexp-handler* y))
          "pong"    "ping"
-         "adapter" "this"
          "s:foo"   "set foo"
          "g:bar"   "get bar"
          "error"   "foobar"))
 
   (testing "without else"
-    (is (nil? ((regexp-handler #"^ping$" (constantly "pong")) "adapter" "text"))))
+    (is (nil? ((regexp-handler #"^ping$" (constantly "pong")) "text"))))
 
   (testing "empty reg-fn-list"
-    (is (nil? ((regexp-handler) "adapter" "text"))))
+    (is (nil? ((regexp-handler) "text"))))
 
   (testing "invalid reg-fn-list"
-    (is (thrown? AssertionError ((regexp-handler :lonely) "adapter" "text")))))
+    (is (thrown? AssertionError ((regexp-handler :lonely) "text")))))
 

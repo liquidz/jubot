@@ -14,4 +14,4 @@
                    [[ring/ring-mock "0.2.0"]
                     [org.clojars.runa/conjure "2.2.0"]]}}
 
-  :aliases {"dev-run" ["run" "-m" "jubot.dev/-main"]})
+  :aliases {"dev" ["run" "-m" "jubot.dev/-main"]})

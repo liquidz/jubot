@@ -1,7 +1,7 @@
 (ns jubot.brain
   (:refer-clojure :exclude [set get]))
 
-(def ^:private brain (atom nil))
+(def ^:private _brain_ (atom nil))
 
 (defprotocol Brain
   (set* [this k v])
@@ -9,12 +9,12 @@
 
 (defn set-brain!
   [b]
-  (reset! brain b))
+  (reset! _brain_ b))
 
 (defn set
   [k v]
-  (set* @brain k v))
+  (set* @_brain_ k v))
 
 (defn get
   [k]
-  (get* @brain k))
+  (get* @_brain_ k))

@@ -3,13 +3,12 @@
     [jubot.adapter :refer :all]))
 
 (defadapter TestAdapter
-  (start!
+  (start*
     [this handler-fn]
     (str "started: " (:botname this)))
-
-  (send!
+  (send*
     [this text]
-    (str "send: " (:botname this) " " text))
+    (str "send: " (:botname this) " " text)))
 
 
 

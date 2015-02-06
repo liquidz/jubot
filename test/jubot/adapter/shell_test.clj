@@ -6,7 +6,7 @@
 
 (def ^:private botname "test")
 (def ^:pricate this (->ShellAdapter botname))
-(defn handler [_ text] (str "[" text "]"))
+(defn handler [text] (str "[" text "]"))
 
 (deftest test-process-output
   (stubbing [println* str]

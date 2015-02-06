@@ -5,37 +5,31 @@
     [conjure.core   :refer [stubbing]]
     [clojure.test   :refer :all]))
 
-(deftest test-clear-schedule!
-  (is (= [] (clear-schedule!))))
+(deftest test-schedule
+  (let [f (schedule "foo" (constantly "bar"))]
+    (is (= "bar" (f)))
+    (is (= "foo" (-> f meta :schedule)))))
 
-(deftest test-set-schedule!
-  (let [[a]   (do (clear-schedule!) (set-schedule! "foo" inc))
-        [b c] (set-schedule! "bar" dec)
-        ]
+(deftest test-schedules
+  (let [fs (schedules "foo" (constantly "bar")
+                      "bar" (constantly "baz"))]
     (are [x y] (= x y)
-         "foo" (-> a meta :schedule)
-         "foo" (-> b meta :schedule)
-         "bar" (-> c meta :schedule)
-         2     (a 1)
-         2     (b 1)
-         0     (c 1)
-         a     b)))
+         "bar" ((first fs))
+         "foo" (-> fs first meta :schedule)
+         "baz" ((second fs))
+         "bar" (-> fs second meta :schedule))))
 
 (deftest test-start-schedule!
   (testing "with some schedules"
     (stubbing [cronj hash-map
                start! identity]
-      (clear-schedule!)
-      (set-schedule! "foo" (constantly "bar"))
-      (set-schedule! "bar" (constantly "baz"))
-
-      (let [[entry _ :as entries] (:entries (start-schedule! "adapter"))]
+      (let [entries (schedules "foo" (constantly "bar")
+                               "bar" (constantly "baz"))
+            [entry _ :as entries] (:entries (start-schedule! "adapter" entries))]
         (are [x y] (= x y)
              2         (count entries)
              "bar"     ((:handler entry) nil {})
-             "foo"     (:schedule entry)
-             "adapter" (-> entry :opts :adapter)))))
+             "foo"     (:schedule entry)))))
 
   (testing "without schedule"
-    (is (nil? (do (clear-schedule!)
-                  (start-schedule! "adapter"))))))
+    (is (nil? (start-schedule! "adapter" [])))))

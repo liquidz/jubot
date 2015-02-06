@@ -1,34 +1,22 @@
 (ns jubot.schedule
   (:require [cronj.core :as c]))
 
-(def ^:private cron-entries (atom []))
-
-(defn clear-schedule!
-  []
-  (reset! cron-entries []))
-
-(defn set-schedule!
+(defn schedule
   [cron-expr f]
-  (swap! cron-entries conj (with-meta f {:schedule cron-expr})))
+  (with-meta f {:schedule cron-expr}))
+
+(defn schedules
+  [& args]
+  (map #(apply schedule %) (partition 2 args)))
 
 (defn- schedule->task
-  [adapter f]
+  [f]
   {:id       (str (gensym "task"))
-   :handler  #(-> %2 :adapter f)
-   :schedule (-> f meta :schedule)
-   :opts     {:adapter adapter}})
+   :handler  (fn [t opt] (f))
+   :schedule (-> f meta :schedule)})
 
 (defn start-schedule!
-  [adapter]
-  (when-not (empty? @cron-entries)
-    (c/start!
-      (c/cronj :entries (map (partial schedule->task adapter)
-                             @cron-entries)))))
-
-
-(defn start-schedule!*
   [adapter entries]
   (when-not (empty? entries)
     (c/start!
-      (c/cronj :entries (map (partial schedule->task adapter)
-                             entries)))))
+      (c/cronj :entries (map schedule->task entries)))))

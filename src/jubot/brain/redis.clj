@@ -1,5 +1,6 @@
 (ns jubot.brain.redis
   (:require
+    ;[jubot.brain :refer :all]
     [taoensso.timbre  :as timbre]
     [taoensso.carmine :as car]))
 
@@ -19,5 +20,6 @@
 
 (defrecord RedisBrain []
   jubot.brain.Brain
+  ;Brain
   (set* [this k v] (wcar* (car/set k v)))
   (get* [this k]   (wcar* (car/get k))))

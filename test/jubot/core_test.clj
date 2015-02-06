@@ -1,14 +1,14 @@
 (ns jubot.core-test
   (:require
     [jubot.core    :refer :all]
-    [jubot.adapter :refer [start-adapter]]
+    [jubot.adapter :refer [start-adapter!]]
     [conjure.core  :refer [stubbing]]
     [clojure.test  :refer :all]))
 
-(def ^:private main-fn (jubot "handler"))
+(def ^:private main-fn (jubot :handler "handler"))
 
 (deftest test-jubot
-  (stubbing [start-adapter list]
+  (stubbing [start-adapter! list]
     (testing "default adapter"
       (let [[adapter handler] (main-fn)]
         (are [x y] (= x y)

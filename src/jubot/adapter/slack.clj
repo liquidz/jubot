@@ -53,7 +53,7 @@
                  (not-from-slackbot user_name)
                  (valid-outgoing-token token)
                  (text-to-bot botname)
-                 (handler-fn this)
+                 handler-fn
                  (hash-map :username botname :text)
                  json/write-str)
         "")))
@@ -73,10 +73,10 @@
               :handler-fn bot-handler)))
 
 (defadapter SlackAdapter
-  (start! [this handler-fn]
+  (start* [this handler-fn]
           (run-jetty
             (-> app api (with-adapter this handler-fn))
             {:port  (Integer. (or (getenv* "PORT") DEFAULT_PORT))
              :join? false}))
-  (send! [this text]
+  (send* [this text]
          (process-output this text)))

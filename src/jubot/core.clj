@@ -5,7 +5,7 @@
     [jubot.brain         :refer [set-brain!]]
     [jubot.brain.memory  :refer [->MemoryBrain]]
     [jubot.brain.redis   :refer [->RedisBrain]]
-    [jubot.schedule      :refer [start-schedule! start-schedule!*]]
+    [jubot.schedule      :refer [start-schedule!]]
     [jubot.adapter.shell :refer [->ShellAdapter]]
     [jubot.adapter.slack :refer [->SlackAdapter]]
     ))
@@ -31,6 +31,5 @@
                     "redis" (->RedisBrain)
                     (->MemoryBrain))]
       (set-brain! brain)
-      ;(start-schedule! adapter)
-      (start-schedule!* adapter schedule)
-      (start-adapter adapter handler))))
+      (start-schedule! adapter schedule)
+      (start-adapter! adapter handler))))
