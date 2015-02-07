@@ -1,6 +1,6 @@
 (ns jubot.adapter.test
   (:require
-    [jubot.adapter :refer :all]))
+    [jubot.adapter.protocol :refer :all]))
 
 (defadapter TestAdapter
   (start*

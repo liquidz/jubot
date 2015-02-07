@@ -4,6 +4,7 @@
                  [compojure "1.3.1"]
                  [ring/ring-jetty-adapter "1.3.2"]
                  [ring/ring-devel "1.3.2"]
+                 [ring/ring-defaults "0.1.3"]
                  [org.clojure/data.json "0.2.5"]
                  [com.taoensso/carmine "2.9.0"]
                  [com.taoensso/timbre "3.3.1"]

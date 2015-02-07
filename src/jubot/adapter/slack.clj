@@ -1,12 +1,13 @@
 (ns jubot.adapter.slack
   (:require
-    [jubot.adapter :refer :all]
-    [ring.adapter.jetty     :refer [run-jetty]]
-    [compojure.core         :refer [defroutes GET POST]]
-    [compojure.route        :refer [not-found]]
-    [compojure.handler      :refer [api]]
-    [clojure.data.json      :as    json]
-    [clj-http.lite.client   :as    client]))
+    [jubot.adapter.protocol   :refer :all]
+    [jubot.adapter.util       :refer :all]
+    [ring.adapter.jetty       :refer [run-jetty]]
+    [ring.middleware.defaults :refer :all]
+    [compojure.core           :refer [defroutes GET POST]]
+    [compojure.route          :refer [not-found]]
+    [clojure.data.json        :as    json]
+    [clj-http.lite.client     :as    client]))
 
 (def ^:private DEFAULT_PORT 8080)
 (def ^:private OUTGOING_TOKEN_KEY "SLACK_OUTGOING_TOKEN")
@@ -75,7 +76,9 @@
 (defadapter SlackAdapter
   (start* [this handler-fn]
           (run-jetty
-            (-> app api (with-adapter this handler-fn))
+            (-> app
+                (wrap-defaults api-defaults)
+                (with-adapter this handler-fn))
             {:port  (Integer. (or (getenv* "PORT") DEFAULT_PORT))
              :join? false}))
   (send* [this text]

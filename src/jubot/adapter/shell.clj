@@ -1,6 +1,7 @@
 (ns jubot.adapter.shell
   (:require
-    [jubot.adapter :refer :all]))
+    [jubot.adapter.protocol :refer :all]
+    [jubot.adapter.util :refer :all]))
 
 (def username (or (System/getenv "USER") "anonymous"))
 
@@ -21,8 +22,9 @@
   (start* [this handler-fn]
           (println* "this is jubot shell adapter.")
           (println* (str "bot's name is \"" (:botname this) "\"."))
-          (.start (Thread.  #(while true
-                               (process-input this handler-fn (read-line))))))
+          (.start (Thread. #(loop []
+                              (process-input this handler-fn (read-line))
+                              (recur)))))
   (send* [this text]
          (process-output this text)))
 

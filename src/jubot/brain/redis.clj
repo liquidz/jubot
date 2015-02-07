@@ -1,8 +1,8 @@
 (ns jubot.brain.redis
   (:require
-    ;[jubot.brain :refer :all]
-    [taoensso.timbre  :as timbre]
-    [taoensso.carmine :as car]))
+    [jubot.brain.protocol :refer :all]
+    [taoensso.timbre      :as timbre]
+    [taoensso.carmine     :as car]))
 
 (def ^:private DEFAULT_REDIS_URI "redis://localhost:6379/")
 
@@ -19,7 +19,6 @@
        (timbre/error ~'e))))
 
 (defrecord RedisBrain []
-  jubot.brain.Brain
-  ;Brain
+  Brain
   (set* [this k v] (wcar* (car/set k v)))
   (get* [this k]   (wcar* (car/get k))))

@@ -17,6 +17,6 @@
 
 (defn start-schedule!
   [adapter entries]
-  (when-not (empty? entries)
+  (when (seq entries)
     (c/start!
       (c/cronj :entries (map schedule->task entries)))))
