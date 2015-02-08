@@ -1,17 +1,20 @@
 (ns jubot.brain
-  (:require [jubot.brain.protocol :refer :all])
+  (:require
+    [jubot.system       :refer [system]]
+    [jubot.brain.memory :refer [map->MemoryBrain]]
+    [jubot.brain.redis  :refer [map->RedisBrain]])
   (:refer-clojure :exclude [set get]))
 
-(def ^:private _brain_ (atom nil))
-
-(defn set-brain!
-  [b]
-  (reset! _brain_ b))
+(defn create-brain
+  [{:keys [brain] :as config-option}]
+  (case brain
+    "redis" (map->RedisBrain config-option)
+    (map->MemoryBrain config-option)))
 
 (defn set
   [k v]
-  (set* @_brain_ k v))
+  (some-> system :brain :set (as-> f (f k v))))
 
 (defn get
   [k]
-  (get* @_brain_ k))
+  (some-> system :brain :get (as-> f (f k))))

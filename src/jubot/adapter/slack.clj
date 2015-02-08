@@ -1,7 +1,7 @@
 (ns jubot.adapter.slack
   (:require
-    [jubot.adapter.protocol   :refer :all]
-    [jubot.adapter.util       :refer :all]
+    [jubot.adapter.util :refer [text-to-bot]]
+    [com.stuartsierra.component :as component]
     [ring.adapter.jetty       :refer [run-jetty]]
     [ring.middleware.defaults :refer :all]
     [compojure.core           :refer [defroutes GET POST]]
@@ -42,14 +42,16 @@
   [this text]
   (let [url     (getenv* INCOMING_URL_KEY)
         payload {:text text
-                 :username (:botname this)}]
-    (when url
-      (client/post url {:form-params {:payload (json/write-str payload)}}))))
+                 :username (:name this)}]
+    (println (json/write-str payload))
+    #_(when url
+      (client/post url {:form-params {:payload (json/write-str payload)}})
+      )))
 
 (defn process-input
   [this handler-fn params]
   (let [{:keys [token user_name text]} params
-        botname (:botname this)]
+        botname (:name this)]
     (or (some->> text
                  (not-from-slackbot user_name)
                  (valid-outgoing-token token)
@@ -62,24 +64,38 @@
 (defroutes app
   (GET "/" {:keys [adapter]}
     (str "this is jubot slack adapter."
-         " bot's name is \"" (:botname adapter) "\"."))
+         " bot's name is \"" (:name adapter) "\"."))
   (POST "/" {:keys [adapter handler-fn params]}
     (process-input adapter handler-fn params))
   (not-found "page not found"))
 
-(defn- with-adapter
+(defn- wrap-adapter
   [handler adapter bot-handler]
   #(handler
      (assoc % :adapter    adapter
               :handler-fn bot-handler)))
 
-(defadapter SlackAdapter
-  (start* [this handler-fn]
-          (run-jetty
-            (-> app
-                (wrap-defaults api-defaults)
-                (with-adapter this handler-fn))
-            {:port  (Integer. (or (getenv* "PORT") DEFAULT_PORT))
-             :join? false}))
-  (send* [this text]
-         (process-output this text)))
+
+(defrecord SlackAdapter [name server handler]
+  component/Lifecycle
+  (start [this]
+    (if server
+      this
+      (do (println ";; start slack adapter. bot name is" name)
+          (let [server (run-jetty
+                         (-> app
+                             (wrap-defaults api-defaults)
+                             (wrap-adapter this handler))
+                         {:port (Integer. (or (getenv* "PORT") DEFAULT_PORT))
+                          :join? false })]
+            (assoc this
+                   :server server
+                   :out    (partial process-output this))))))
+  (stop [this]
+    (if-not server
+      this
+      (do (println ";; stop slack adapter")
+          (try (.stop server)
+               (catch Exception e
+                 (println ";; error occured when stopping server:" e)))
+          (assoc this :server nil)))))
