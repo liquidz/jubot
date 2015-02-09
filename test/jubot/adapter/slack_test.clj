@@ -2,6 +2,7 @@
   (:require
     [com.stuartsierra.component :as component]
     [jubot.adapter.slack  :refer :all]
+    [jubot.di             :refer :all]
     [conjure.core         :refer [stubbing]]
     [clojure.data.json    :as    json]
     [clojure.test         :refer :all]

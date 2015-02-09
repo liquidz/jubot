@@ -1,6 +1,7 @@
 (ns jubot.adapter.slack
   (:require
     [jubot.adapter.util :refer [text-to-bot]]
+    [jubot.di :refer :all]
     [com.stuartsierra.component :as component]
     [ring.adapter.jetty       :refer [run-jetty]]
     [ring.middleware.defaults :refer :all]
@@ -26,8 +27,6 @@
 ;  :text         "foo bar"}
 ; ------------------------------------------
 
-(def getenv* #(System/getenv %))
-
 (defn not-from-slackbot
   [username text]
   (if (not= "slackbot" username)
@@ -43,10 +42,8 @@
   (let [url     (getenv* INCOMING_URL_KEY)
         payload {:text text
                  :username (:name this)}]
-    (println (json/write-str payload))
-    #_(when url
-      (client/post url {:form-params {:payload (json/write-str payload)}})
-      )))
+    (when url
+      (client/post url {:form-params {:payload (json/write-str payload)}}))))
 
 (defn process-input
   [this handler-fn params]
