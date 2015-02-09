@@ -2,8 +2,7 @@
   (:require
     [jubot.system :refer [system]]
     [jubot.adapter.repl :refer [map->ReplAdapter]]
-    [jubot.adapter.slack :refer [map->SlackAdapter]]
-    ))
+    [jubot.adapter.slack :refer [map->SlackAdapter]]))
 
 (defn create-adapter
   [{:keys [adapter] :as config-option}]
