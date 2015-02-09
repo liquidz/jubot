@@ -1,13 +1,14 @@
 (ns jubot.adapter.repl
   (:require
     [jubot.adapter.util :refer :all]
+    [jubot.di :refer :all]
     [com.stuartsierra.component :as component]))
 
-(defn- process-output
+(defn process-output
   [{:keys [name]} s]
-  (println (str name "=> " s)))
+  (println* (str name "=> " s)))
 
-(defn- process-input
+(defn process-input
   [{:keys [name handler] :as this} s]
   (some->> s
            (text-to-bot name)
