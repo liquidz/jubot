@@ -1,17 +1,12 @@
 (ns jubot.adapter-test
   (:require
-    [jubot.adapter :refer :all]
-    [jubot.system  :refer [system]]
-    [clojure.test  :refer :all]
-    [conjure.core  :refer [stubbing]]))
+    [jubot.adapter     :refer :all]
+    [jubot.system      :refer [system]]
+    [jubot.system-test :refer [with-mocked-system]]
+    [clojure.test      :refer :all]
+    [conjure.core      :refer [stubbing]]))
 
 (def ^:private botname "test")
-(defn- with-mocked-system
-  [system-value f]
-  (let [before system]
-    (alter-var-root #'jubot.system/system (constantly system-value))
-    (f)
-    (alter-var-root #'jubot.system/system (constantly before))))
 
 
 (deftest test-create-adapter
