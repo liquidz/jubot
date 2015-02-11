@@ -9,12 +9,12 @@
     ;; FIXME
     jubot.adapter
     jubot.brain
-    jubot.util.handler
+    jubot.handler
     jubot.scheduler
     ))
 
 (def test-handler
-  (jubot.util.handler/regexp-handler
+  (jubot.handler/regexp-handler
     #"^ping$"            (constantly "PONG")
     #"^option$"          (fn [opt] (str opt))
     #"^set (.+?) (.+?)$" (fn [{[[_ k v]] :match}] (jubot.brain/set k v))

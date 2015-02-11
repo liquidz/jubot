@@ -1,4 +1,4 @@
-(ns jubot.util.handler)
+(ns jubot.handler)
 
 (defn regexp-handler
   [& reg-fn-list]

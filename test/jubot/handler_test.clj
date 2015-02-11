@@ -1,4 +1,4 @@
-(ns jubot.util.handler-test
+(ns jubot.handler-test
   (:require
     [jubot.util.handler :refer :all]
     [clojure.test :refer :all]))
