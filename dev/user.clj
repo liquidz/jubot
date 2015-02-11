@@ -16,8 +16,9 @@
 (def test-handler
   (jubot.util.handler/regexp-handler
     #"^ping$"            (constantly "PONG")
-    #"^set (.+?) (.+?)$" (fn [[[_ k v]]] (jubot.brain/set k v))
-    #"^get (.+?)$"       (fn [[[_ k]]]   (jubot.brain/get k))
+    #"^option$"          (fn [opt] (str opt))
+    #"^set (.+?) (.+?)$" (fn [{[[_ k v]] :match}] (jubot.brain/set k v))
+    #"^get (.+?)$"       (fn [{[[_ k]] :match}]   (jubot.brain/get k))
     :else                (constantly "unknown command")))
 
 (def test-schedule

@@ -47,12 +47,14 @@
 
 (defn process-input
   [this handler-fn params]
-  (let [{:keys [token user_name text]} params
-        botname (:name this)]
+  (let [{:keys [token user_name channel_name text]} params
+        botname (:name this)
+        option  {:user user_name :channel channel_name}]
     (or (some->> text
                  (not-from-slackbot user_name)
                  (valid-outgoing-token token)
                  (text-to-bot botname)
+                 (assoc option :text)
                  handler-fn
                  (hash-map :username botname :text)
                  json/write-str)
