@@ -1,9 +1,10 @@
 (ns jubot.schedule-test
   (:require
-    [jubot.schedule :refer :all]
-    [cronj.core     :refer [cronj start!]]
-    [conjure.core   :refer [stubbing]]
-    [clojure.test   :refer :all]))
+    [com.stuartsierra.component :as component]
+    [jubot.scheduler :refer :all]
+    [cronj.core      :as c]
+    [conjure.core    :refer [stubbing]]
+    [clojure.test    :refer :all]))
 
 (deftest test-schedule
   (let [f (schedule "foo" (constantly "bar"))]
@@ -19,17 +20,22 @@
          "baz" ((second fs))
          "bar" (-> fs second meta :schedule))))
 
-(deftest test-start-schedule!
-  (testing "with some schedules"
-    (stubbing [cronj hash-map
-               start! identity]
-      (let [entries (schedules "foo" (constantly "bar")
-                               "bar" (constantly "baz"))
-            [entry _ :as entries] (:entries (start-schedule! "adapter" entries))]
-        (are [x y] (= x y)
-             2         (count entries)
-             "bar"     ((:handler entry) nil {})
-             "foo"     (:schedule entry)))))
+(def ^:private test-entries
+  (schedules "foo" (constantly "bar")))
 
-  (testing "without schedule"
-    (is (nil? (start-schedule! "adapter" [])))))
+(deftest test-create-scheduler
+  (testing "no entries"
+    (let [s (create-scheduler {})]
+      (are [x y] (= x y)
+           jubot.scheduler.Scheduler (type s)
+           []                        (:entries s))))
+
+  (testing "with test-entries"
+    (stubbing [c/start! nil, c/stop! nil]
+      (let [started (component/start (create-scheduler {:entries test-entries}))
+            stopped (component/stop started)]
+        (are [x y] (= x y)
+             false                (nil? (:cj started))
+             (count test-entries) (count (:entries started))
+             (first test-entries) (first (:entries started))
+             true                 (nil? (:cj stopped)))))))

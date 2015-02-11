@@ -1,18 +1,15 @@
 (ns jubot.adapter
-  (:require [jubot.adapter.protocol :refer :all]))
+  (:require
+    [jubot.system :refer [system]]
+    [jubot.adapter.repl :refer [map->ReplAdapter]]
+    [jubot.adapter.slack :refer [map->SlackAdapter]]))
 
-(def ^:private _adapter_ (atom nil))
+(defn create-adapter
+  [{:keys [adapter] :as config-option}]
+  (case adapter
+    "slack" (map->SlackAdapter config-option)
+    (map->ReplAdapter config-option)))
 
-(defn set-adapter!
-  [a]
-  (reset! _adapter_ a))
-
-(defn send!
-  [text]
-  (send* @_adapter_ text))
-
-(defn start-adapter!
-  [adapter handler-fn]
-  (set-adapter! adapter)
-  (start* @_adapter_ handler-fn))
-
+(defn out
+  [s]
+  (some-> system :adapter :out (as-> f (f s))))

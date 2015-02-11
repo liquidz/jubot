@@ -1,29 +1,25 @@
 (ns jubot.dev
   (:require
-    [jubot.core :refer :all]
+    [jubot.core :as core]
+
+    [jubot.util.handler :refer [regexp-handler]]
     [jubot.adapter :as adapter]
-    [jubot.util.handler :refer :all]
     [jubot.brain :as brain]
-    [jubot.schedule :as js]
-    )
-  )
+    [jubot.scheduler :as js]
+    ))
 
 (def handler
   (regexp-handler
-    #"^ping$"            (constantly "pong")
+    #"^ping$"            (constantly "PONG!!!!!!PONG!!!!!")
     #"^set (.+?) (.+?)$" (fn [[[_ k v]]] (brain/set k v))
     #"^get (.+?)$"       (fn [[[_ k]]]   (brain/get k))
     :else                (constantly "unknown command")))
 
-(def kiteru
-  (with-meta
-    (fn [] (adapter/send! "kiteru"))
-    {:schedule "/5 * * * * * *"}))
+(def schedule
+  (js/schedules
+    "/5 * * * * * *" #(adapter/out "KITERU")))
 
-;(schedules
-;  "..." (fn [] ...)
-;  ",,," (fn [] ,,,))
-
-(def -main (jubot :handler handler
-                  :schedule [kiteru]
-                  ))
+(def -main (core/jubot
+             :handler handler
+             :entries [];schedule
+             ))

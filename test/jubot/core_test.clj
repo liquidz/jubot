@@ -1,22 +1,29 @@
 (ns jubot.core-test
   (:require
-    [jubot.core    :refer :all]
-    [jubot.adapter :refer [start-adapter!]]
-    [conjure.core  :refer [stubbing]]
-    [clojure.test  :refer :all]))
+    [jubot.system :as sys]
+    [jubot.core   :refer :all]
+    [conjure.core :refer [stubbing]]
+    [clojure.test :refer :all]))
 
-(def ^:private main-fn (jubot :handler "handler"))
+(def ^:private f (jubot :handler "handler" :entries "entries"))
 
 (deftest test-jubot
-  (stubbing [start-adapter! list]
-    (testing "default adapter"
-      (let [[adapter handler] (main-fn)]
+  (stubbing [sys/start nil]
+    (testing "default parameters"
+      (let [{:keys [adapter brain scheduler]} (do (f) sys/system)
+            {:keys [name handler]} adapter
+            {:keys [entries]} scheduler]
         (are [x y] (= x y)
-             (type adapter) jubot.adapter.shell.ShellAdapter
-             handler        "handler")))
+             jubot.adapter.slack.SlackAdapter (type adapter)
+             jubot.brain.memory.MemoryBrain   (type brain)
+             jubot.scheduler.Scheduler        (type scheduler)
+             DEFAULT_BOTNAME                  name
+             "handler"                        handler
+             "entries"                        entries)))
 
-    (testing "slack adapter"
-      (let [[adapter handler] (main-fn "-a" "slack")]
+    (testing "specify adapter and botname"
+      (let [{:keys [adapter brain scheduler]} (do (f "-n" "foo" "-a" "repl")
+                                                sys/system)]
         (are [x y] (= x y)
-             (type adapter) jubot.adapter.slack.SlackAdapter
-             handler        "handler")))))
+             jubot.adapter.repl.ReplAdapter (type adapter)
+             "foo" (:name adapter))))))

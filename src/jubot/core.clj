@@ -1,18 +1,25 @@
 (ns jubot.core
   (:require
-    [clojure.tools.cli   :refer [parse-opts]]
-    [jubot.adapter       :refer :all]
-    [jubot.brain         :refer [set-brain!]]
-    [jubot.brain.memory  :refer [->MemoryBrain]]
-    [jubot.brain.redis   :refer [->RedisBrain]]
-    [jubot.schedule      :refer [start-schedule!]]
-    [jubot.adapter.shell :refer [->ShellAdapter]]
-    [jubot.adapter.slack :refer [->SlackAdapter]]
-    ))
+    [com.stuartsierra.component :as component]
+    [jubot.system      :as sys]
+    [jubot.adapter     :refer [create-adapter]]
+    [jubot.brain       :refer [create-brain]]
+    [jubot.scheduler   :refer [create-scheduler]]
+    [clojure.tools.cli :refer [parse-opts]]))
 
-(def ^:private DEFAULT_ADAPTER "shell")
-(def ^:private DEFAULT_BRAIN   "memory")
-(def ^:private DEFAULT_BOTNAME "jubot")
+(defn create-system-fn
+  [& {:keys [name handler entries] :or {entries []}}]
+  (fn [{:keys [adapter brain] :as config-option}]
+    (component/system-map
+      :adapter (create-adapter {:adapter adapter
+                                :name name
+                                :handler handler})
+      :brain   (create-brain {:brain brain})
+      :scheduler (create-scheduler {:entries entries}))))
+
+(def ^:const DEFAULT_ADAPTER "slack")
+(def ^:const DEFAULT_BRAIN   "memory")
+(def ^:const DEFAULT_BOTNAME "jubot")
 
 (def ^:private cli-options
   [["-a" "--adapter ADAPTER_NAME" "Select adapter" :default DEFAULT_ADAPTER]
@@ -20,16 +27,13 @@
    ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME] ])
 
 (defn jubot
-  [& {:keys [handler schedule]}]
+  [& {:keys [handler entries]}]
   (fn [& args]
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
-          botname (:name options)
-          adapter (case (:adapter options)
-                    "slack" (->SlackAdapter botname)
-                    (->ShellAdapter botname))
-          brain   (case (:brain options)
-                    "redis" (->RedisBrain)
-                    (->MemoryBrain))]
-      (set-brain! brain)
-      (start-schedule! adapter schedule)
-      (start-adapter! adapter handler))))
+          {:keys [name adapter brain]} options
+          create-system (create-system-fn
+                          :name name
+                          :handler handler
+                          :entries entries)]
+      (sys/init #(create-system options))
+      (sys/start))))

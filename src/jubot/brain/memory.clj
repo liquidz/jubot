@@ -1,9 +1,27 @@
 (ns jubot.brain.memory
-  (:require [jubot.brain.protocol :refer :all]))
+  (:require
+    [com.stuartsierra.component :as component]))
 
-(def ^:private mem (atom {}))
+(defn- set-to-memory
+  [{mem :mem} k v]
+  (swap! mem assoc k v))
 
-(defrecord MemoryBrain []
-  Brain
-  (set* [this k v] (swap! mem assoc k v))
-  (get* [this k]   (get @mem k)))
+(defn- get-from-memory
+  [{mem :mem} k]
+  (get @mem k))
+
+(defrecord MemoryBrain [mem]
+  component/Lifecycle
+  (start [this]
+    (if mem
+      this
+      (do (println ";; start memory brain")
+          (let [this (assoc this :mem (atom {}))]
+            (assoc this
+                   :set (partial set-to-memory this)
+                   :get (partial get-from-memory this))))))
+  (stop [this]
+    (if-not mem
+      this
+      (do (println ";; stop memory brain")
+          (assoc this :mem nil :set nil :get nil)))))

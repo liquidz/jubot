@@ -1,15 +1,20 @@
 (ns jubot.adapter.slack-test
   (:require
+    [com.stuartsierra.component :as component]
     [jubot.adapter.slack  :refer :all]
+    [jubot.di             :refer :all]
     [conjure.core         :refer [stubbing]]
     [clojure.data.json    :as    json]
     [clojure.test         :refer :all]
-    [clj-http.lite.client :refer [post]]))
+    [clj-http.lite.client :refer [post]]
+    [ring.adapter.jetty   :refer [run-jetty]]
+    [ring.middleware.defaults :refer :all]
+    [ring.mock.request    :refer [request]]))
 
 (def ^:private botname "test")
 (def ^:private handler #(str "[" % "]"))
 (def ^:private nil-handler (constantly nil))
-(def ^:private adapter (->SlackAdapter botname))
+(def ^:private adapter (map->SlackAdapter {:name botname}))
 (def ^:private process-input* (partial process-input adapter))
 (def ^:private process-output* (partial process-output adapter))
 
@@ -66,3 +71,30 @@
   (testing "INCOMING_URL_KEY is not defined"
     (stubbing [getenv* nil]
       (is (nil? (process-output* "foo"))))))
+
+(deftest test-app
+  (testing "get"
+    (is (= 200 (-> (request :get "/") app :status))))
+
+  (testing "post"
+    (let [param {:foo "bar"}
+          app   (-> app
+                    (wrap-defaults api-defaults)
+                    (wrap-adapter "adapter" "handler"))]
+      (stubbing [process-input list]
+        (is (= ["adapter" "handler" param]
+               (-> (request :post "/" param) app :body)))))))
+
+(deftest test-SlackAdapter
+  (stubbing [run-jetty "jetty"]
+    (testing "start adapter"
+      (let [adapter (component/start adapter)]
+        (are [x y] (= x y)
+             "jetty" (:server adapter)
+             true    (fn? (:out adapter)))
+        (is (= adapter (component/start adapter)))))
+
+    (testing "stop adapter"
+      (let [adapter (-> adapter component/start component/stop)]
+        (is (nil? (:server adapter)))
+        (is (= adapter (component/stop adapter)))))))

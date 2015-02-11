@@ -26,4 +26,3 @@
 
   (testing "invalid reg-fn-list"
     (is (thrown? AssertionError ((regexp-handler :lonely) "text")))))
-
