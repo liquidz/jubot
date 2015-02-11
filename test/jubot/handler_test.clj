@@ -1,10 +1,10 @@
 (ns jubot.handler-test
   (:require
-    [jubot.handler :refer :all]
-    [clojure.test :refer :all]))
+    [jubot.handler :as handler]
+    [clojure.test  :refer :all]))
 
 (def ^:private regexp-handler*
-  (regexp-handler
+  (handler/regexp
     #"^ping$"      (constantly "pong")
     #"^opt$"       (fn [{:keys [user channel]}]
                      (str "u=" user ",c=" channel))
@@ -12,7 +12,7 @@
     #"^get (.+?)$" (fn [{[[_ x]] :match}] (str "g:" x))
     :else          (constantly "error")))
 
-(deftest test-regexp-handler
+(deftest test-regexp
   (testing "should work fine"
     (are [x y] (= x (regexp-handler* {:user "aa" :channel "bb" :text y}))
          "pong"      "ping"
@@ -22,30 +22,34 @@
          "error"     "foobar"))
 
   (testing "without else"
-    (is (nil? ((regexp-handler #"^ping$" (constantly "pong")) {:text "text"}))))
+    (is (nil? ((handler/regexp #"^ping$" (constantly "pong")) {:text "text"}))))
 
   (testing "empty reg-fn-list"
-    (is (nil? ((regexp-handler) {:text "text"}))))
+    (is (nil? ((handler/regexp) {:text "text"}))))
 
   (testing "invalid reg-fn-list"
-    (is (thrown? AssertionError ((regexp-handler :lonely) {:text "text"})))))
+    (is (thrown? AssertionError ((handler/regexp :lonely) {:text "text"})))))
 
-(deftest test-handler-comp
-  (let [f (fn [{text :text}]
-               (case text "aaa" "111", "bbb" "222", "ping" "pong" nil))
-        g (fn [{text :text}]
-               (case text "bbb" "333", "aaa" "444", "foo" "bar" nil))]
+(deftest test-comp
+  (testing "handler composition"
+    (let [f (fn [{text :text}]
+              (case text "aaa" "111", "bbb" "222", "ping" "pong" nil))
+          g (fn [{text :text}]
+              (case text "bbb" "333", "aaa" "444", "foo" "bar" nil))]
 
-    (are [x y] (= x ((handler-comp g f) {:text y}))
-         "111"  "aaa"
-         "222"  "bbb"
-         "pong" "ping"
-         "bar"  "foo"
-         nil    "xxx")
+      (are [x y] (= x ((handler/comp g f) {:text y}))
+           "111"  "aaa"
+           "222"  "bbb"
+           "pong" "ping"
+           "bar"  "foo"
+           nil    "xxx")
 
-    (are [x y] (= x ((handler-comp f g) {:text y}))
-         "444"  "aaa"
-         "333"  "bbb"
-         "pong" "ping"
-         "bar"  "foo"
-         nil    "xxx")))
+      (are [x y] (= x ((handler/comp f g) {:text y}))
+           "444"  "aaa"
+           "333"  "bbb"
+           "pong" "ping"
+           "bar"  "foo"
+           nil    "xxx")))
+
+  (testing "invalid reg-fn-list"
+    (is (thrown? AssertionError (handler/comp 'a 'b)))))

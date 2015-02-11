@@ -1,6 +1,7 @@
-(ns jubot.handler)
+(ns jubot.handler
+  (:refer-clojure :exclude [comp]))
 
-(defn regexp-handler
+(defn regexp
   [& reg-fn-list]
   {:pre [(zero? (mod (count reg-fn-list) 2))]}
 
@@ -17,8 +18,9 @@
       (partition 2 reg-fn-list))))
 
 
-(defn handler-comp
+(defn comp
   [& fs]
+  {:pre [(every? fn? fs)]}
   (let [fs (reverse fs)]
     (fn [arg]
       (loop [ret ((first fs) arg), fs (next fs)]

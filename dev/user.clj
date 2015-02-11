@@ -14,7 +14,7 @@
     ))
 
 (def test-handler
-  (jubot.handler/regexp-handler
+  (jubot.handler/regexp
     #"^ping$"            (constantly "PONG")
     #"^option$"          (fn [opt] (str opt))
     #"^set (.+?) (.+?)$" (fn [{[[_ k v]] :match}] (jubot.brain/set k v))
