@@ -1,8 +1,8 @@
 (ns user
   (:require
-    [com.stuartsierra.component :as component]
+    [clojure.repl :refer :all]
     [clojure.tools.namespace.repl :refer [refresh]]
-    ;[jubot.component :as app]
+    [com.stuartsierra.component :as component]
     [jubot.core :as core]
     [jubot.system :as sys]
 

@@ -15,3 +15,13 @@
           (reduced (f option))))
       nil
       (partition 2 reg-fn-list))))
+
+
+(defn handler-comp
+  [& fs]
+  (let [fs (reverse fs)]
+    (fn [arg]
+      (loop [ret ((first fs) arg), fs (next fs)]
+        (if (and fs (nil? ret))
+          (recur ((first fs) arg) (next fs))
+          ret)))))

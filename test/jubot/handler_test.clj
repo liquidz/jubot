@@ -1,6 +1,6 @@
 (ns jubot.handler-test
   (:require
-    [jubot.util.handler :refer :all]
+    [jubot.handler :refer :all]
     [clojure.test :refer :all]))
 
 (def ^:private regexp-handler*
@@ -29,3 +29,23 @@
 
   (testing "invalid reg-fn-list"
     (is (thrown? AssertionError ((regexp-handler :lonely) {:text "text"})))))
+
+(deftest test-handler-comp
+  (let [f (fn [{text :text}]
+               (case text "aaa" "111", "bbb" "222", "ping" "pong" nil))
+        g (fn [{text :text}]
+               (case text "bbb" "333", "aaa" "444", "foo" "bar" nil))]
+
+    (are [x y] (= x ((handler-comp g f) {:text y}))
+         "111"  "aaa"
+         "222"  "bbb"
+         "pong" "ping"
+         "bar"  "foo"
+         nil    "xxx")
+
+    (are [x y] (= x ((handler-comp f g) {:text y}))
+         "444"  "aaa"
+         "333"  "bbb"
+         "pong" "ping"
+         "bar"  "foo"
+         nil    "xxx")))
