@@ -6,23 +6,26 @@
 (def ^:private regexp-handler*
   (regexp-handler
     #"^ping$"      (constantly "pong")
-    #"^set (.+?)$" (fn [[[_ x]]] (str "s:" x))
-    #"^get (.+?)$" (fn [[[_ x]]] (str "g:" x))
+    #"^opt$"       (fn [{:keys [user channel]} _]
+                     (str "u=" user ",c=" channel))
+    #"^set (.+?)$" (fn [_ [[_ x]]] (str "s:" x))
+    #"^get (.+?)$" (fn [_ [[_ x]]] (str "g:" x))
     :else          (constantly "error")))
 
 (deftest test-regexp-handler
   (testing "should work fine"
-    (are [x y] (= x (regexp-handler* y))
-         "pong"    "ping"
-         "s:foo"   "set foo"
-         "g:bar"   "get bar"
-         "error"   "foobar"))
+    (are [x y] (= x (regexp-handler* {:user "aa" :channel "bb"} y))
+         "pong"      "ping"
+         "u=aa,c=bb" "opt"
+         "s:foo"     "set foo"
+         "g:bar"     "get bar"
+         "error"     "foobar"))
 
   (testing "without else"
-    (is (nil? ((regexp-handler #"^ping$" (constantly "pong")) "text"))))
+    (is (nil? ((regexp-handler #"^ping$" (constantly "pong")) {} "text"))))
 
   (testing "empty reg-fn-list"
-    (is (nil? ((regexp-handler) "text"))))
+    (is (nil? ((regexp-handler) {} "text"))))
 
   (testing "invalid reg-fn-list"
-    (is (thrown? AssertionError ((regexp-handler :lonely) "text")))))
+    (is (thrown? AssertionError ((regexp-handler :lonely) {} "text")))))

@@ -7,7 +7,8 @@
     [clojure.test       :refer :all]))
 
 (def ^:private botname "test")
-(def ^:private handler #(str "[" % "]"))
+(def ^:private handler (fn [{:keys [user channel]} s]
+                         (str "user=" user ",channel=" channel ",text=" s)))
 (def ^:private adapter (map->ReplAdapter {:name botname :handler handler}))
 (def ^:private process-output* (partial process-output adapter))
 (def ^:private process-input*  (partial process-input adapter))
@@ -19,7 +20,7 @@
 (deftest test-process-input
   (stubbing [println* identity]
     (is (nil? (process-input* "foo")))
-    (is (= (str botname "=> [foo]")
+    (is (= (str botname "=> user=" username ",channel=,text=foo")
            (process-input* (str botname " foo"))))))
 
 (deftest test-ReplAdapter
