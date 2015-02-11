@@ -49,4 +49,3 @@
 
 (defn in [s]
   ((-> sys/system :adapter :in) s))
-

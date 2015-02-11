@@ -66,7 +66,7 @@
     (process-input adapter handler-fn params))
   (not-found "page not found"))
 
-(defn- wrap-adapter
+(defn wrap-adapter
   [handler adapter bot-handler]
   #(handler
      (assoc % :adapter    adapter

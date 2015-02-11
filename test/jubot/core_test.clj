@@ -15,11 +15,11 @@
             {:keys [entries]} scheduler]
         (are [x y] (= x y)
              jubot.adapter.slack.SlackAdapter (type adapter)
-             jubot.brain.memory.MemoryBrain (type brain)
-             jubot.scheduler.Scheduler (type scheduler)
-             DEFAULT_BOTNAME name
-             "handler" handler
-             "entries" entries)))
+             jubot.brain.memory.MemoryBrain   (type brain)
+             jubot.scheduler.Scheduler        (type scheduler)
+             DEFAULT_BOTNAME                  name
+             "handler"                        handler
+             "entries"                        entries)))
 
     (testing "specify adapter and botname"
       (let [{:keys [adapter brain scheduler]} (do (f "-n" "foo" "-a" "repl")

@@ -38,4 +38,3 @@
   [config-option]
   (map->Scheduler (merge {:entries []}
                          config-option)))
-

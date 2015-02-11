@@ -12,14 +12,16 @@
       (are [k] (contains? brain k)
            :mem
            :set
-           :get)))
+           :get)
+      (is (= brain (component/start brain)))))
 
   (testing "stop brain"
     (let [brain (-> brain component/start component/stop)]
       (are [k] (nil? (get brain k))
            :mem
            :set
-           :get)))
+           :get)
+      (is (= brain (component/stop brain)))))
 
   (testing "set/get"
     (let [brain (component/start brain)]

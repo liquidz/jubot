@@ -7,7 +7,9 @@
     [clojure.data.json    :as    json]
     [clojure.test         :refer :all]
     [clj-http.lite.client :refer [post]]
-    [ring.adapter.jetty   :refer [run-jetty]]))
+    [ring.adapter.jetty   :refer [run-jetty]]
+    [ring.middleware.defaults :refer :all]
+    [ring.mock.request    :refer [request]]))
 
 (def ^:private botname "test")
 (def ^:private handler #(str "[" % "]"))
@@ -70,6 +72,18 @@
     (stubbing [getenv* nil]
       (is (nil? (process-output* "foo"))))))
 
+(deftest test-app
+  (testing "get"
+    (is (= 200 (-> (request :get "/") app :status))))
+
+  (testing "post"
+    (let [param {:foo "bar"}
+          app   (-> app
+                    (wrap-defaults api-defaults)
+                    (wrap-adapter "adapter" "handler"))]
+      (stubbing [process-input list]
+        (is (= ["adapter" "handler" param]
+               (-> (request :post "/" param) app :body)))))))
 
 (deftest test-SlackAdapter
   (stubbing [run-jetty "jetty"]
@@ -77,8 +91,10 @@
       (let [adapter (component/start adapter)]
         (are [x y] (= x y)
              "jetty" (:server adapter)
-             true    (fn? (:out adapter)))))
+             true    (fn? (:out adapter)))
+        (is (= adapter (component/start adapter)))))
 
     (testing "stop adapter"
       (let [adapter (-> adapter component/start component/stop)]
-        (is (nil? (:server adapter)))))))
+        (is (nil? (:server adapter)))
+        (is (= adapter (component/stop adapter)))))))

@@ -15,7 +15,8 @@
                  ]
 
   :profiles {:dev {:dependencies
-                   [[org.clojars.runa/conjure "2.2.0"]]
+                   [[org.clojars.runa/conjure "2.2.0"]
+                    [ring/ring-mock "0.2.0"]]
                    :source-paths ["dev"]}}
 
   :aliases {"dev" ["run" "-m" "jubot.dev/-main"]}

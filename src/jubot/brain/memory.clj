@@ -25,4 +25,3 @@
       this
       (do (println ";; stop memory brain")
           (assoc this :mem nil :set nil :get nil)))))
-
