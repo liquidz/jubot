@@ -12,8 +12,8 @@
     [ring.mock.request    :refer [request]]))
 
 (def ^:private botname "test")
-(def ^:private handler (fn [{:keys [user channel]} s]
-                         (str "user=" user ",channel=" channel ",text=" s)))
+(def ^:private handler (fn [{:keys [user channel text]}]
+                         (str "user=" user ",channel=" channel ",text=" text)))
 (def ^:private nil-handler (constantly nil))
 (def ^:private adapter (map->SlackAdapter {:name botname}))
 (def ^:private process-input* (partial process-input adapter))

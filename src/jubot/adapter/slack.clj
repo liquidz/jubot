@@ -54,7 +54,8 @@
                  (not-from-slackbot user_name)
                  (valid-outgoing-token token)
                  (text-to-bot botname)
-                 (handler-fn option)
+                 (assoc option :text)
+                 handler-fn
                  (hash-map :username botname :text)
                  json/write-str)
         "")))

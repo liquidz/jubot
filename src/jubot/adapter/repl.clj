@@ -12,10 +12,11 @@
 
 (defn process-input
   [{:keys [name handler] :as this} s]
-  (let [opt {:user username :channel nil}]
+  (let [option {:user username :channel nil}]
     (some->> s
              (text-to-bot name)
-             (handler opt)
+             (assoc option :text)
+             handler
              (process-output this))))
 
 (defrecord ReplAdapter [name handler in out]
