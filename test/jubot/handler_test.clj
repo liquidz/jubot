@@ -65,9 +65,9 @@
               (fn [{text :text}] (if (= "foo" text) "bar"))))
 
   (testing "public-handlers"
-    (is (= [#'jubot.test.a/f #'jubot.test.b/g]
+    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
            (handler/public-handlers #"^jubot\.test")))
-    (is (= [#'jubot.test.a/f]
+    (is (= (map resolve '(jubot.test.a/f))
            (handler/public-handlers #"^jubot\.test\.a"))))
 
   (testing "collect"

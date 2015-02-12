@@ -51,9 +51,9 @@
               (schedules "y" (constantly "yy"), "z" (constantly "zz"))))
 
   (testing "public-schedules"
-    (is (= [#'jubot.test.a/f #'jubot.test.b/g]
+    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
            (public-schedules #"^jubot\.test")))
-    (is (= [#'jubot.test.a/f]
+    (is (= (map resolve '(jubot.test.a/f))
            (public-schedules #"^jubot\.test\.a"))))
 
   (testing "collect"
