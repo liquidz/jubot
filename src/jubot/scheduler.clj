@@ -38,3 +38,15 @@
   [config-option]
   (map->Scheduler (merge {:entries []}
                          config-option)))
+
+
+(defn public-schedules
+  [ns-regexp]
+  (->> (all-ns)
+       (filter #(re-find ns-regexp (str (ns-name %))))
+       (mapcat #(vals (ns-publics %)))
+       (filter #(:jubot-schedule? (meta %)))))
+
+(defn collect
+  [ns-regexp]
+  (flatten (map var-get (public-schedules ns-regexp))))
