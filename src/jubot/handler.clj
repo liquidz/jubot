@@ -17,13 +17,23 @@
       nil
       (partition 2 reg-fn-list))))
 
-
 (defn comp
   [& fs]
-  {:pre [(every? fn? fs)]}
+  {:pre [(every? #(or (fn? %) (var? %)) fs)]}
   (let [fs (reverse fs)]
     (fn [arg]
       (loop [ret ((first fs) arg), fs (next fs)]
         (if (and fs (nil? ret))
           (recur ((first fs) arg) (next fs))
           ret)))))
+
+(defn public-handlers
+  [ns-regexp]
+  (->> (all-ns)
+       (filter #(re-find ns-regexp (str (ns-name %))))
+       (mapcat #(vals (ns-publics %)))
+       (filter #(:jubot-handler? (meta %)))))
+
+(defn collect
+  [ns-regexp]
+  (apply comp (public-handlers ns-regexp)))

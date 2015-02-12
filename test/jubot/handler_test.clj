@@ -53,3 +53,29 @@
 
   (testing "invalid reg-fn-list"
     (is (thrown? AssertionError (handler/comp 'a 'b)))))
+
+(deftest test-collect
+  (do (create-ns 'jubot.test.a)
+      (create-ns 'jubot.test.b)
+      (intern 'jubot.test.a
+              (with-meta 'f {:jubot-handler? true})
+              (fn [{text :text}] (if (= "ping" text) "pong")))
+      (intern 'jubot.test.b
+              (with-meta 'g {:jubot-handler? true})
+              (fn [{text :text}] (if (= "foo" text) "bar"))))
+
+  (testing "public-handlers"
+    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
+           (handler/public-handlers #"^jubot\.test")))
+    (is (= (map resolve '(jubot.test.a/f))
+           (handler/public-handlers #"^jubot\.test\.a"))))
+
+  (testing "collect"
+    (are [x y] (= x ((handler/collect #"^jubot\.test") {:text y}))
+         "pong" "ping"
+         "bar"  "foo"
+         nil    "xxx")
+    (are [x y] (= x ((handler/collect #"^jubot\.test\.a") {:text y}))
+         "pong" "ping"
+         nil    "foo"
+         nil    "xxx")))

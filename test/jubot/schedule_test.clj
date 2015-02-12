@@ -39,3 +39,30 @@
              (count test-entries) (count (:entries started))
              (first test-entries) (first (:entries started))
              true                 (nil? (:cj stopped)))))))
+
+(deftest test-collect
+  (do (create-ns 'jubot.test.a)
+      (create-ns 'jubot.test.b)
+      (intern 'jubot.test.a
+              (with-meta 'f {:jubot-schedule? true})
+              (schedule "x" (constantly "xx")))
+      (intern 'jubot.test.b
+              (with-meta 'g {:jubot-schedule? true})
+              (schedules "y" (constantly "yy"), "z" (constantly "zz"))))
+
+  (testing "public-schedules"
+    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
+           (public-schedules #"^jubot\.test")))
+    (is (= (map resolve '(jubot.test.a/f))
+           (public-schedules #"^jubot\.test\.a"))))
+
+  (testing "collect"
+    (let [[a b c :as ls] (collect #"^jubot\.test")]
+      (are [x y] (= x y)
+           3    (count ls)
+           "x"  (-> a meta :schedule)
+           "xx" (a)
+           "y"  (-> b meta :schedule)
+           "yy" (b)
+           "z"  (-> c meta :schedule)
+           "zz" (c)))))
