@@ -18,14 +18,15 @@
       (partition 2 reg-fn-list))))
 
 (defn comp
-  [& fs]
-  {:pre [(every? #(or (fn? %) (var? %)) fs)]}
-  (let [fs (reverse fs)]
-    (fn [arg]
-      (loop [ret ((first fs) arg), fs (next fs)]
-        (if (and fs (nil? ret))
-          (recur ((first fs) arg) (next fs))
-          ret)))))
+  ([] identity)
+  ([& fs]
+   {:pre [(every? #(or (fn? %) (var? %)) fs)]}
+   (let [fs (reverse fs)]
+     (fn [arg]
+       (loop [ret ((first fs) arg), fs (next fs)]
+         (if (and fs (nil? ret))
+           (recur ((first fs) arg) (next fs))
+           ret))))))
 
 (defn public-handlers
   [ns-regexp]

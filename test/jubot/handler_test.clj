@@ -51,6 +51,9 @@
            "bar"  "foo"
            nil    "xxx")))
 
+  (testing "empty list"
+    (is (= identity (handler/comp))))
+
   (testing "invalid reg-fn-list"
     (is (thrown? AssertionError (handler/comp 'a 'b)))))
 
