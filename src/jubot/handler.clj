@@ -1,7 +1,7 @@
 (ns jubot.handler
   (:refer-clojure :exclude [comp]))
 
-(def ^:const HANDLER_REGEXP #".+?-handler$")
+(def ^:const HANDLER_REGEXP #"^.+?-handler$")
 
 (defn regexp
   [& reg-fn-list]

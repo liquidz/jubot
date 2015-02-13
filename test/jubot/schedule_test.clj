@@ -43,17 +43,15 @@
 (deftest test-collect
   (do (create-ns 'jubot.test.a)
       (create-ns 'jubot.test.b)
-      (intern 'jubot.test.a
-              (with-meta 'f {:jubot-schedule? true})
+      (intern 'jubot.test.a 'a-schedule
               (schedule "x" (constantly "xx")))
-      (intern 'jubot.test.b
-              (with-meta 'g {:jubot-schedule? true})
+      (intern 'jubot.test.b 'b-schedule
               (schedules "y" (constantly "yy"), "z" (constantly "zz"))))
 
   (testing "public-schedules"
-    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
+    (is (= (map resolve '(jubot.test.a/a-schedule jubot.test.b/b-schedule))
            (public-schedules #"^jubot\.test")))
-    (is (= (map resolve '(jubot.test.a/f))
+    (is (= (map resolve '(jubot.test.a/a-schedule))
            (public-schedules #"^jubot\.test\.a"))))
 
   (testing "collect"

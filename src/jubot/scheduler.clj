@@ -3,6 +3,8 @@
     [com.stuartsierra.component :as component]
     [cronj.core :as c]))
 
+(def ^:const SCHEDULE_REGEXP #"^.+?-schedule$")
+
 (defn schedule
   [cron-expr f]
   (with-meta f {:schedule cron-expr}))
@@ -39,13 +41,12 @@
   (map->Scheduler (merge {:entries []}
                          config-option)))
 
-
 (defn public-schedules
   [ns-regexp]
   (->> (all-ns)
        (filter #(re-find ns-regexp (str (ns-name %))))
        (mapcat #(vals (ns-publics %)))
-       (filter #(:jubot-schedule? (meta %)))))
+       (filter #(re-matches SCHEDULE_REGEXP (-> % meta :name str)))))
 
 (defn collect
   [ns-regexp]
