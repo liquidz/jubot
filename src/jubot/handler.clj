@@ -1,6 +1,8 @@
 (ns jubot.handler
   (:refer-clojure :exclude [comp]))
 
+(def ^:const HANDLER_REGEXP #".+?-handler$")
+
 (defn regexp
   [& reg-fn-list]
   {:pre [(zero? (mod (count reg-fn-list) 2))]}
@@ -33,7 +35,7 @@
   (->> (all-ns)
        (filter #(re-find ns-regexp (str (ns-name %))))
        (mapcat #(vals (ns-publics %)))
-       (filter #(:jubot-handler? (meta %)))))
+       (filter #(re-matches HANDLER_REGEXP (-> % meta :name str)))))
 
 (defn collect
   [ns-regexp]
