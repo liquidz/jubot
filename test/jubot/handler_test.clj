@@ -60,17 +60,15 @@
 (deftest test-collect
   (do (create-ns 'jubot.test.a)
       (create-ns 'jubot.test.b)
-      (intern 'jubot.test.a
-              (with-meta 'f {:jubot-handler? true})
+      (intern 'jubot.test.a 'a-handler
               (fn [{text :text}] (if (= "ping" text) "pong")))
-      (intern 'jubot.test.b
-              (with-meta 'g {:jubot-handler? true})
+      (intern 'jubot.test.b 'b-handler
               (fn [{text :text}] (if (= "foo" text) "bar"))))
 
   (testing "public-handlers"
-    (is (= (map resolve '(jubot.test.a/f jubot.test.b/g))
+    (is (= (map resolve '(jubot.test.a/a-handler jubot.test.b/b-handler))
            (handler/public-handlers #"^jubot\.test")))
-    (is (= (map resolve '(jubot.test.a/f))
+    (is (= (map resolve '(jubot.test.a/a-handler))
            (handler/public-handlers #"^jubot\.test\.a"))))
 
   (testing "collect"
