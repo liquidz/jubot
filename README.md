@@ -5,21 +5,7 @@ Clojure bot framework
 
 ## Usage
 
-[![Clojars Project](http://clojars.org/jubot/latest-version.svg)](http://clojars.org/jubot)
-
-```
-beco -i -c heroku /heroku_login.sh
-beco heroku apps:create
-beco heroku addons:add rediscloud
-beco -c heroku git push heroku master
-```
-
-### Slack Adapter
-
-```
-beco heroku config:add SLACK_OUTGOING_TOKEN=YOUR_SLACK_OUTGOING_TOKEN
-beco heroku config:add SLACK_INCOMING_URL=YOUR_SLACK_INCOMING_URL
-```
+WORK IN PROGRESS
 
 ## License
 
