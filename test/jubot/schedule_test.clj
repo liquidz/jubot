@@ -41,21 +41,25 @@
              true                 (nil? (:cj stopped)))))))
 
 (deftest test-collect
-  (do (create-ns 'jubot.test.a)
-      (create-ns 'jubot.test.b)
-      (intern 'jubot.test.a 'a-schedule
+  (do (create-ns 'jubot.test.scheduler.a)
+      (create-ns 'jubot.test.scheduler.b)
+      (intern 'jubot.test.scheduler.a 'a-schedule
               (schedule "x" (constantly "xx")))
-      (intern 'jubot.test.b 'b-schedule
+      (intern 'jubot.test.scheduler.b 'b-schedule
               (schedules "y" (constantly "yy"), "z" (constantly "zz"))))
 
   (testing "public-schedules"
-    (is (= (map resolve '(jubot.test.a/a-schedule jubot.test.b/b-schedule))
-           (public-schedules #"^jubot\.test")))
-    (is (= (map resolve '(jubot.test.a/a-schedule))
-           (public-schedules #"^jubot\.test\.a"))))
+    (is (= (map resolve '(jubot.test.scheduler.a/a-schedule
+                           jubot.test.scheduler.b/b-schedule))
+           (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
+                 (public-schedules #"^jubot\.test\.scheduler"))))
+    (is (= (map resolve '(jubot.test.scheduler.a/a-schedule))
+           (public-schedules #"^jubot\.test\.scheduler\.a"))))
 
   (testing "collect"
-    (let [[a b c :as ls] (collect #"^jubot\.test")]
+    (let [ls (sort #(.compareTo (-> %1 meta :schedule) (-> %2 meta :schedule))
+                   (collect #"^jubot\.test\.scheduler"))
+          [a b c] ls]
       (are [x y] (= x y)
            3    (count ls)
            "x"  (-> a meta :schedule)
@@ -63,4 +67,5 @@
            "y"  (-> b meta :schedule)
            "yy" (b)
            "z"  (-> c meta :schedule)
-           "zz" (c)))))
+           "zz" (c)))
+    (is (empty? (collect #"^foobar")))))

@@ -58,25 +58,28 @@
     (is (thrown? AssertionError (handler/comp 'a 'b)))))
 
 (deftest test-collect
-  (do (create-ns 'jubot.test.a)
-      (create-ns 'jubot.test.b)
-      (intern 'jubot.test.a 'a-handler
+  (do (create-ns 'jubot.test.handler.a)
+      (create-ns 'jubot.test.handler.b)
+      (intern 'jubot.test.handler.a 'a-handler
               (fn [{text :text}] (if (= "ping" text) "pong")))
-      (intern 'jubot.test.b 'b-handler
+      (intern 'jubot.test.handler.b 'b-handler
               (fn [{text :text}] (if (= "foo" text) "bar"))))
 
   (testing "public-handlers"
-    (is (= (map resolve '(jubot.test.a/a-handler jubot.test.b/b-handler))
-           (handler/public-handlers #"^jubot\.test")))
-    (is (= (map resolve '(jubot.test.a/a-handler))
-           (handler/public-handlers #"^jubot\.test\.a"))))
+    (is (= (map resolve '(jubot.test.handler.a/a-handler
+                          jubot.test.handler.b/b-handler))
+           (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
+                 (handler/public-handlers #"^jubot\.test\.handler"))))
+    (is (= (map resolve '(jubot.test.handler.a/a-handler))
+           (handler/public-handlers #"^jubot\.test\.handler\.a"))))
 
   (testing "collect"
-    (are [x y] (= x ((handler/collect #"^jubot\.test") {:text y}))
+    (are [x y] (= x ((handler/collect #"^jubot\.test\.handler") {:text y}))
          "pong" "ping"
          "bar"  "foo"
          nil    "xxx")
-    (are [x y] (= x ((handler/collect #"^jubot\.test\.a") {:text y}))
+    (are [x y] (= x ((handler/collect #"^jubot\.test\.handler\.a") {:text y}))
          "pong" "ping"
          nil    "foo"
-         nil    "xxx")))
+         nil    "xxx")
+    (is (nil? ((handler/collect #"^foobar") {:text "foo"})))))
