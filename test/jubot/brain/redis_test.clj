@@ -26,9 +26,9 @@
       (is (= brain (component/stop brain)))))
 
   (testing "specify redis uri"
-    (is (= DEFAULT_REDIS_URI (-> brain component/start :conn :uri)))
+    (is (= DEFAULT_REDIS_URI (-> brain component/start :conn :spec :uri)))
     (is (= "foo" (-> (map->RedisBrain {:uri "foo"})
-                     component/start :conn :uri))))
+                     component/start :conn :spec :uri))))
 
   (testing "set/get"
     (let [brain (-> brain component/start)]
