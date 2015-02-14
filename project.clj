@@ -1,4 +1,4 @@
-(defproject jubot "0.0.1-SNAPSHOT"
+(defproject jubot "0.0.1-SNAPSHOT-1"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.stuartsierra/component "0.2.2"]
                  [org.clojure/tools.namespace "0.2.9"]
