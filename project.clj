@@ -1,4 +1,4 @@
-(defproject jubot "0.0.1-SNAPSHOT-3"
+(defproject jubot "0.0.1-SNAPSHOT-4"
   :description "FIXME: write description"
   :url "https://github.com/liquidz/jubot"
   :license {:name "Eclipse Public License"

@@ -27,10 +27,10 @@
     (if conn
       this
       (let [conn {:pool {}
-                  :uri (or uri
-                           (getenv* "REDISCLOUD_URL")
-                           DEFAULT_REDIS_URI)}]
-        (println ";; start redis brain. redis url is" (:uri conn))
+                  :spec {:uri (or uri
+                                  (getenv* "REDISCLOUD_URL")
+                                  DEFAULT_REDIS_URI)}}]
+        (println ";; start redis brain. redis url is" (-> conn :spec :uri))
         (assoc this
                :conn conn
                :set (partial set-to-redis conn)
