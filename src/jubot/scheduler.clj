@@ -3,7 +3,7 @@
     [com.stuartsierra.component :as component]
     [cronj.core :as c]))
 
-(def ^:const SCHEDULE_REGEXP #"^.+?-schedule$")
+(def ^:const SCHEDULE_REGEXP #"^.*-schedule$")
 
 (defn schedule
   [cron-expr f]
