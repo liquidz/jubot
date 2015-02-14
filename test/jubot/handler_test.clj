@@ -8,8 +8,8 @@
     #"^ping$"      (constantly "pong")
     #"^opt$"       (fn [{:keys [user channel]}]
                      (str "u=" user ",c=" channel))
-    #"^set (.+?)$" (fn [{[[_ x]] :match}] (str "s:" x))
-    #"^get (.+?)$" (fn [{[[_ x]] :match}] (str "g:" x))
+    #"^set (.+?)$" (fn [{[_ x] :match}] (str "s:" x))
+    #"^get (.+?)$" (fn [{[_ x] :match}] (str "g:" x))
     :else          (constantly "error")))
 
 (deftest test-regexp

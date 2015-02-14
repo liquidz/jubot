@@ -11,7 +11,7 @@
     (reduce
       (fn [_ [r f]]
         (if (instance? java.util.regex.Pattern r)
-          (some->> (re-seq r text)
+          (some->> (re-find r text)
                    (assoc option :match)
                    f
                    reduced)
