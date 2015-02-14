@@ -24,5 +24,15 @@
                     [ring/ring-mock "0.2.0"]]
                    :source-paths ["dev"]}}
 
+
+  :codox {;:exclude [misaki.compiler.demo.core
+          ;          misaki.compiler.copy.core]
+          :src-dir-uri "http://github.com/liquidz/jubot/blob/master/"
+          :src-linenum-anchor-prefix "L"
+          ;:output-dir "doc/public/api"
+          }
+
+
+
   :aliases {"dev" ["run" "-m" "jubot.dev/-main"]}
   )
