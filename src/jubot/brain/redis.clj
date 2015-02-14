@@ -26,15 +26,15 @@
   (start [this]
     (if conn
       this
-      (do (println ";; start redis brain")
-          (let [conn {:pool {}
-                      :uri (or uri
-                               (getenv* "REDISCLOUD_URL")
-                               DEFAULT_REDIS_URI)}]
-            (assoc this
-                   :conn conn
-                   :set (partial set-to-redis conn)
-                   :get (partial get-from-redis conn))))))
+      (let [conn {:pool {}
+                  :spec {:uri (or uri
+                                  (getenv* "REDISCLOUD_URL")
+                                  DEFAULT_REDIS_URI)}}]
+        (println ";; start redis brain. redis url is" (-> conn :spec :uri))
+        (assoc this
+               :conn conn
+               :set (partial set-to-redis conn)
+               :get (partial get-from-redis conn)))))
   (stop [this]
     (if-not conn
       this

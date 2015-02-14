@@ -7,11 +7,11 @@
     [jubot.scheduler :as js]
     ))
 
-(def handler
+(def main-handler
   (handler/regexp
     #"^ping$"            (constantly "PONG!!!!!!PONG!!!!!")
-    #"^set (.+?) (.+?)$" (fn [{[[_ k v]] :match}] (brain/set k v))
-    #"^get (.+?)$"       (fn [{[[_ k]] :match}]   (brain/get k))
+    #"^set (.+?) (.+?)$" (fn [{[_ k v] :match}] (brain/set k v))
+    #"^get (.+?)$"       (fn [{[_ k]   :match}] (brain/get k))
     :else                (constantly "unknown command")))
 
 (def schedule
@@ -19,6 +19,6 @@
     "/5 * * * * * *" #(adapter/out "KITERU")))
 
 (def -main (core/jubot
-             :handler handler
+             :handler (handler/collect #"^jubot.dev")
              :entries [];schedule
              ))

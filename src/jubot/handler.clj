@@ -39,4 +39,6 @@
 
 (defn collect
   [ns-regexp]
-  (apply comp (public-handlers ns-regexp)))
+  (if-let [handlers (seq (public-handlers ns-regexp))]
+    (apply comp handlers)
+    (constantly nil)))
