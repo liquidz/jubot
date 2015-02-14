@@ -1,4 +1,9 @@
 (defproject jubot "0.0.1-SNAPSHOT-1"
+  :description "FIXME: write description"
+  :url "https://github.com/liquidz/jubot"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.stuartsierra/component "0.2.2"]
                  [org.clojure/tools.namespace "0.2.9"]
