@@ -1,16 +1,32 @@
 (ns jubot.adapter.repl
+  "Jubot adapter for REPL."
   (:require
     [jubot.adapter.util :refer :all]
     [jubot.redef        :refer :all]
     [com.stuartsierra.component :as component]))
 
-(def username (or (getenv* "USER") "nobody"))
+(def ^{:doc "User name. (default is \"nobody\")"}
+  username (or (getenv* "USER") "nobody"))
 
 (defn process-output
+  "Process output to REPL.
+
+  Params
+    :name - Bot's name.
+    s     - Output text to REPL.
+  "
   [{:keys [name]} s]
   (println* (str name "=> " s)))
 
 (defn process-input
+  "Process input from REPL.
+
+  Params
+    this       - REPL adapter.
+      :name    - Bot's name.
+      :handler - A handler function.
+    s          - Input text from REPL.
+  "
   [{:keys [name handler] :as this} s]
   (let [option {:user username :channel nil}]
     (some->> s
