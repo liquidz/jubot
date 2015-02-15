@@ -1,7 +1,7 @@
 (ns jubot.adapter.repl
   (:require
     [jubot.adapter.util :refer :all]
-    [jubot.di           :refer :all]
+    [jubot.redef        :refer :all]
     [com.stuartsierra.component :as component]))
 
 (def username (or (getenv* "USER") "nobody"))

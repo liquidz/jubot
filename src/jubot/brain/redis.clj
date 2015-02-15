@@ -1,7 +1,7 @@
 (ns jubot.brain.redis
   (:require
     [com.stuartsierra.component :as component]
-    [jubot.di             :refer :all]
+    [jubot.redef          :refer :all]
     [taoensso.timbre      :as timbre]
     [taoensso.carmine     :as car]))
 

@@ -1,4 +1,4 @@
-(ns jubot.di
+(ns jubot.redef
   "テスト時にスタブ化できるように関数定義する")
 
 (def ^{:doc "clojure.core/println"}

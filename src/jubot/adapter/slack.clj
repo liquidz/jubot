@@ -1,7 +1,7 @@
 (ns jubot.adapter.slack
   (:require
     [jubot.adapter.util :refer [text-to-bot]]
-    [jubot.di :refer :all]
+    [jubot.redef :refer :all]
     [com.stuartsierra.component :as component]
     [ring.adapter.jetty       :refer [run-jetty]]
     [ring.middleware.defaults :refer :all]
