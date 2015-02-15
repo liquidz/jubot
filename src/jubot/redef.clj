@@ -1,5 +1,5 @@
 (ns jubot.redef
-  "テスト時にスタブ化できるように関数定義する")
+  "Redefining function fot stubbing.")
 
 (def ^{:doc "clojure.core/println"}
   println* println)
