@@ -2,7 +2,7 @@
   (:require
     [com.stuartsierra.component :as component]
     [jubot.adapter.repl :refer :all]
-    [jubot.di           :refer :all]
+    [jubot.redef        :refer :all]
     [conjure.core       :refer [stubbing]]
     [clojure.test       :refer :all]))
 

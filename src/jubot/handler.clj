@@ -1,9 +1,22 @@
 (ns jubot.handler
+  "Jubot handler utilities."
   (:refer-clojure :exclude [comp]))
 
-(def ^:const HANDLER_REGEXP #"^.*-handler$")
+(def ^{:const true
+       :doc "The handler name regular expression for collecting handler functions automatically."}
+  HANDLER_REGEXP #"^.*-handler$")
 
 (defn regexp
+  "Generate a handler function from pair of regular expression and function.
+
+  Params
+    reg-fn-list - Pair of regular expression and function.
+                  If the regular expression is matched, the paired function is called.
+                  In addition to original handler input,
+                  `re-find` result will be passed to the paired function.
+  Return
+    A handler function.
+  "
   [& reg-fn-list]
   {:pre [(zero? (mod (count reg-fn-list) 2))]}
 
@@ -20,6 +33,13 @@
       (partition 2 reg-fn-list))))
 
 (defn comp
+  "Compose handler functions.
+
+  Params
+    fs - Sequence of handler functions.
+  Return
+    Composition of handler functions.
+  "
   ([] identity)
   ([& fs]
    {:pre [(every? #(or (fn? %) (var? %)) fs)]}
@@ -31,6 +51,13 @@
            ret))))))
 
 (defn public-handlers
+  "Return sequence of public handler functions which matched HANDLER_REGEXP in specified namespaces.
+
+  Params
+    ns-regexp - A regular expression which specifies namespaces for searching handler functions.
+  Return
+    Sequence of handler functions.
+  "
   [ns-regexp]
   (->> (all-ns)
        (filter #(re-find ns-regexp (str (ns-name %))))
@@ -38,6 +65,13 @@
        (filter #(re-matches HANDLER_REGEXP (-> % meta :name str)))))
 
 (defn collect
+  "Return composition of public handler functions in specified namespaces.
+
+  Params
+    ns-regexp - A regular expression which specifies namespaces for searching handler functions.
+  Return
+    A handler function.
+  "
   [ns-regexp]
   (if-let [handlers (seq (public-handlers ns-regexp))]
     (apply comp handlers)
