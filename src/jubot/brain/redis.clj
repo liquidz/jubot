@@ -1,11 +1,14 @@
 (ns jubot.brain.redis
+  "Jubot brain for Redis."
   (:require
     [com.stuartsierra.component :as component]
     [jubot.redef          :refer :all]
     [taoensso.timbre      :as timbre]
     [taoensso.carmine     :as car]))
 
-(def ^:const DEFAULT_REDIS_URI "redis://localhost:6379/")
+(def ^{:const true
+       :doc "Default redis URI."}
+  DEFAULT_REDIS_URI "redis://localhost:6379/")
 
 (defn- set-to-redis
   [conn k v]

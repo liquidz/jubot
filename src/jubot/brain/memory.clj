@@ -1,4 +1,5 @@
 (ns jubot.brain.memory
+  "Jubot brain for memory."
   (:require
     [com.stuartsierra.component :as component]))
 
