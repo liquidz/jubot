@@ -1,4 +1,7 @@
 (ns jubot.adapter.slack
+  "Jubot adapter for Slack.
+  https://slack.com/
+  "
   (:require
     [jubot.adapter.util :refer [text-to-bot]]
     [jubot.redef :refer :all]
@@ -14,30 +17,41 @@
 (def ^:private OUTGOING_TOKEN_KEY "SLACK_OUTGOING_TOKEN")
 (def ^:private INCOMING_URL_KEY   "SLACK_INCOMING_URL")
 
-; ------------------------------------------
-; {:channel_id   "xxxxxxxxx",
-;  :token        "xxxxxxxxxxxxxxxxxxxxxxxx",
-;  :channel_name "test",
-;  :user_id      "xxxxxxxxx",
-;  :team_id      "xxxxxxxxx",
-;  :service_id   "xxxxxxxxxx",
-;  :user_name    "slackbot",
-;  :team_domain  "uochan",
-;  :timestamp    "1422058599.000004",
-;  :text         "foo bar"}
-; ------------------------------------------
-
 (defn not-from-slackbot
+  "If the user name of inputted message is \"slackbot\", return text as it is.
+  If that's not the case, return nil.
+
+  Params
+    username - The user name of inputted message.
+    text     - Message from user.
+  Return
+    Text string or nil.
+  "
   [username text]
   (if (not= "slackbot" username)
     text))
 
 (defn valid-outgoing-token
+  "If the outgoing token is valid, return text as it is.
+  If that's not the case, return nil.
+
+  Params
+    token - Outgoing token passed from slack.
+    text  - Message from user.
+  Return
+    Text string or nil.
+  "
   [token text]
   (if (= token (getenv* OUTGOING_TOKEN_KEY))
     text))
 
 (defn process-output
+  "Process output to Slack.
+
+  Params
+    this - Slack adapter.
+    text - Output text to Slack.
+  "
   [this text]
   (let [url     (getenv* INCOMING_URL_KEY)
         payload {:text text
@@ -46,6 +60,23 @@
       (client/post url {:form-params {:payload (json/write-str payload)}}))))
 
 (defn process-input
+  "Process input from Slack.
+
+  Params
+    this       - REPL adapter.
+    handler-fn - A handler function.
+    params     - POST parameters.
+      {:channel_id   \"xxxxxxxxx\",
+       :token        \"xxxxxxxxx\",
+       :channel_name \"test\",
+       :user_id      \"xxxxxxxxx\",
+       :team_id      \"xxxxxxxxx\",
+       :service_id   \"xxxxxxxxx\",
+       :user_name    \"slackbot\",
+       :team_domain  \"uochan\",
+       :timestamp    \"1422058599.000004\",
+       :text         \"foo bar\"}
+  "
   [this handler-fn params]
   (let [{:keys [token user_name channel_name text]} params
         botname (:name this)
@@ -69,6 +100,15 @@
   (not-found "page not found"))
 
 (defn wrap-adapter
+  "Ring middleware to wrap jubot adapter on request.
+
+  Params
+    handler     - A ring handler.
+    adapter     - A jubot adapter.
+    bot-handler - A jubot handler function.
+  Return
+    A ring handler.
+  "
   [handler adapter bot-handler]
   #(handler
      (assoc % :adapter    adapter
