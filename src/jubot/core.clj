@@ -1,5 +1,5 @@
 (ns jubot.core
-  "jubot のコア"
+  "Jubot core"
   (:require
     [com.stuartsierra.component :as component]
     [clojure.tools.cli :refer [parse-opts]]
@@ -11,15 +11,15 @@
     [jubot.require     :as jr]))
 
 (defn create-system-fn
-  "システムを作成するための関数を生成して返す関数
+  "Returns function to create stuartsierra.component system.
 
-  @params
-    :name    - ボットの名前
-    :handler - ハンドラー関数
-    :entries - スケジュールのエントリーリスト
+  Params
+    :name    - a bot's name
+    :handler - a handler function
+    :entries - a sequence of schedule entries
 
-  @return
-    function
+  Return
+    (fn [{:keys [adapter brain] :as config-option}])
   "
   [& {:keys [name handler entries] :or {entries []}}]
   (fn [{:keys [adapter brain] :as config-option}]
@@ -30,9 +30,9 @@
       :brain     (jb/create-brain     {:brain brain})
       :scheduler (js/create-scheduler {:entries entries}))))
 
-(def ^{:const true :doc "デフォルトのアダプター名"} DEFAULT_ADAPTER "slack")
-(def ^{:const true :doc "デフォルトのブレイン名"} DEFAULT_BRAIN   "memory")
-(def ^{:const true :doc "デフォルトのボット名"} DEFAULT_BOTNAME "jubot")
+(def ^{:const true :doc "Default adapter's name"} DEFAULT_ADAPTER "slack")
+(def ^{:const true :doc "Default brain's name"}   DEFAULT_BRAIN   "memory")
+(def ^{:const true :doc "Default bot's name"}     DEFAULT_BOTNAME "jubot")
 
 (def ^:private cli-options
   [["-a" "--adapter ADAPTER_NAME" "Select adapter" :default DEFAULT_ADAPTER]
@@ -40,18 +40,21 @@
    ["-n" "--name NAME"            "Set bot name"   :default DEFAULT_BOTNAME]])
 
 (defn jubot
-  "jubot 起動時のメイン関数を生成して返す関数
+  "Returns jubot -main function.
 
-  @params
-    :handler   - ハンドラー関数
-    :entries   - スケジュールのエントリーリスト
-    :ns-regexp - ハンドラーやスケジュールリストを定義しているネームスペースを示す正規表現。handler, entries を省略した場合には、この正規表現に一致するネームスペースから handler, entries を自動的に集める
+  Params
+    :handler   - a handler function
+    :entries   - a sequence of schedule entries
+    :ns-regexp - a regular-expression which specifies bot's namespace.
+                 if a handler and entries are omitted,
+                 these are collected automatically from the specified namespace.
 
-  @return
-    function
+  Return
+    (fn [& args])
   "
   [& {:keys [handler entries ns-regexp]}]
   (fn [& args]
+    ; require namespaces automatically
     (when ns-regexp (jr/regexp-require ns-regexp))
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
           {:keys [name adapter brain debug]} options
