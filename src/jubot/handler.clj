@@ -1,19 +1,21 @@
 (ns jubot.handler
-  "ハンドラーのユーティリティ"
+  "Jubot handler utilities."
   (:refer-clojure :exclude [comp]))
 
-(def ^{:const true :doc "自動で収集する対象ハンドラー名の正規表現"}
+(def ^{:const true
+       :doc "The handler name regular expression for collecting handler functions automatically."}
   HANDLER_REGEXP #"^.*-handler$")
 
 (defn regexp
-  "正規表現と関数のリストからハンドラー関数を生成し返す
+  "Generate a handler function from pair of regular expression and function.
 
   Params
-    reg-fn-list - 正規表現と関数のペア
-                  正規表現にマッチした入力があった場合に、対応する関数が呼び出される
-                  関数にはハンドラーへの入力に加えて正規表現にマッチした結果(re-findの戻り値)を :match として追加したものが渡される
+    reg-fn-list - Pair of regular expression and function.
+                  If the regular expression is matched, the paired function is called.
+                  In addition to original handler input,
+                  `re-find` result will be passed to the paired function.
   Return
-    ハンドラー関数
+    A handler function.
   "
   [& reg-fn-list]
   {:pre [(zero? (mod (count reg-fn-list) 2))]}
@@ -31,12 +33,12 @@
       (partition 2 reg-fn-list))))
 
 (defn comp
-  "ハンドラー関数を合成する
+  "Compose handler functions.
 
   Params
-    fs - ハンドラー関数のシーケンス
+    fs - Sequence of handler functions.
   Return
-    合成されたハンドラー関数
+    Composition of handler functions.
   "
   ([] identity)
   ([& fs]
@@ -49,12 +51,12 @@
            ret))))))
 
 (defn public-handlers
-  "指定されたネームスペース内で HANDLER_REGEXP にマッチするパブリックなハンドラー関数のシーケンスを返す
+  "Return sequence of public handler functions which matched HANDLER_REGEXP in specified namespaces.
 
   Params
-    ns-regexp - ハンドラー関数検索対象のネームスペースの正規表現
+    ns-regexp - A regular expression which specifies namespaces for searching handler functions.
   Return
-    ハンドラー関数のシーケンス
+    Sequence of handler functions.
   "
   [ns-regexp]
   (->> (all-ns)
@@ -63,12 +65,12 @@
        (filter #(re-matches HANDLER_REGEXP (-> % meta :name str)))))
 
 (defn collect
-  "指定されたネームスペース内で HANDLER_REGEXP にマッチするパブリックなハンドラー関数を合成して返す
+  "Return composition of public handler functions in specified namespaces.
 
   Params
-    ns-regexp - ハンドラー関数検索対象のネームスペースの正規表現
+    ns-regexp - A regular expression which specifies namespaces for searching handler functions.
   Return
-    ハンドラー関数
+    A handler function.
   "
   [ns-regexp]
   (if-let [handlers (seq (public-handlers ns-regexp))]
