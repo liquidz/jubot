@@ -1,4 +1,8 @@
-(ns jubot.di)
+(ns jubot.di
+  "テスト時にスタブ化できるように関数定義する")
 
-(def println* println)
-(def getenv*  #(System/getenv %))
+(def ^{:doc "clojure.core/println"}
+  println* println)
+
+(def ^{:doc "System/getenv"}
+  getenv*  #(System/getenv %))
