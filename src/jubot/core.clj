@@ -23,12 +23,14 @@
   "
   [& {:keys [name handler entries] :or {entries []}}]
   (fn [{:keys [adapter brain] :as config-option}]
-    (component/system-map
-      :adapter   (ja/create-adapter   {:adapter adapter
-                                       :name name
-                                       :handler handler})
-      :brain     (jb/create-brain     {:brain brain})
-      :scheduler (js/create-scheduler {:entries entries}))))
+    (let [built-in-entries (js/collect #"^jubot.scheduler\.")
+          entries          (concat entries built-in-entries)]
+      (component/system-map
+        :adapter   (ja/create-adapter   {:adapter adapter
+                                         :name name
+                                         :handler handler})
+        :brain     (jb/create-brain     {:brain brain})
+        :scheduler (js/create-scheduler {:entries entries})))))
 
 (def ^{:const true :doc "Default adapter's name"} DEFAULT_ADAPTER "slack")
 (def ^{:const true :doc "Default brain's name"}   DEFAULT_BRAIN   "memory")

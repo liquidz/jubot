@@ -1,52 +1,18 @@
 (ns user
   (:require
-    [clojure.repl :refer :all]
     [clojure.tools.namespace.repl :refer [refresh]]
-    [com.stuartsierra.component :as component]
-    [jubot.core :as core]
+    [clojure.repl :refer :all]
     [jubot.system :as sys]
+    [dev          :refer [-main]]))
 
-    ;; FIXME
-    jubot.adapter
-    jubot.brain
-    jubot.handler
-    jubot.scheduler
-    ))
-
-(def test-handler
-  (jubot.handler/regexp
-    #"^ping$"            (constantly "PONG")
-    #"^option$"          (fn [opt] (str opt))
-    #"^set (.+?) (.+?)$" (fn [{[[_ k v]] :match}] (jubot.brain/set k v))
-    #"^get (.+?)$"       (fn [{[[_ k]] :match}]   (jubot.brain/get k))
-    :else                (constantly "unknown command")))
-
-(def test-schedule
-  []
-  #_(jubot.scheduler/schedules
-    "/5 * * * * * *" #(jubot.adapter/out "kiteruyo!!"))
-  )
-
-(def ^:private create-system
-  (core/create-system-fn :name "jubot"
-                         :handler test-handler
-                         :entries test-schedule
-                         ))
-
-(def init (partial sys/init #(create-system {:adapter "repl"
-                                             :brain "memory"})))
-
-
-(def start sys/start)
 (def stop sys/stop)
 
-(defn go []
-  (init)
-  (sys/start))
+(defn start []
+  (-main "-a" "repl" "-b" "memory"))
 
-(defn reset []
+(defn restart []
   (sys/stop)
-  (refresh :after 'user/go))
+    (refresh :after 'user/start))
 
 (defn in [s]
   ((-> sys/system :adapter :in) s))

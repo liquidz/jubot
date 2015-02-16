@@ -1,11 +1,12 @@
 (ns jubot.core-test
   (:require
-    [jubot.system :as sys]
-    [jubot.core   :refer :all]
-    [conjure.core :refer [stubbing]]
-    [clojure.test :refer :all]))
+    [jubot.scheduler.keep-awake :refer :all]
+    [jubot.system               :as sys]
+    [jubot.core                 :refer :all]
+    [conjure.core               :refer [stubbing]]
+    [clojure.test               :refer :all]))
 
-(def ^:private f (jubot :handler "handler" :entries "entries"))
+(def ^:private f (jubot :handler "handler" :entries ["entries"]))
 
 (deftest test-jubot
   (stubbing [sys/start nil]
@@ -19,7 +20,7 @@
              jubot.scheduler.Scheduler        (type scheduler)
              DEFAULT_BOTNAME                  name
              "handler"                        handler
-             "entries"                        entries)))
+             "entries"                        (first entries))))
 
     (testing "specify adapter and botname"
       (let [{:keys [adapter brain scheduler]} (do (f "-n" "foo" "-a" "repl")
@@ -27,6 +28,13 @@
         (are [x y] (= x y)
              jubot.adapter.repl.ReplAdapter (type adapter)
              "foo" (:name adapter))))
+
+    (testing "built-in schedules"
+      (let [{:keys [scheduler]} (do (f) sys/system)
+            {:keys [entries]} scheduler
+            entries (set entries)]
+        (are [x] (some? (entries x))
+             keep-awake-schedule)))
 
     (testing "ns-regexp"
       (do (create-ns 'jubot.test.core.a)
