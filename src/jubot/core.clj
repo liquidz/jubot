@@ -8,7 +8,8 @@
     [jubot.brain       :as jb]
     [jubot.scheduler   :as js]
     [jubot.handler     :as jh]
-    [jubot.require     :as jr]))
+    [jubot.require     :as jr]
+    [jubot.scheduler [keep-awake]]))
 
 (defn create-system-fn
   "Returns function to create stuartsierra.component system.
