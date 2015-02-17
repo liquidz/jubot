@@ -87,6 +87,7 @@
                  (text-to-bot botname)
                  (assoc option :text)
                  handler-fn
+                 (str user_name ": ")
                  (hash-map :username botname :text)
                  json/write-str)
         "")))
