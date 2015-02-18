@@ -21,6 +21,9 @@
          "g:bar"     "get bar"
          "error"     "foobar"))
 
+  (testing "nil input"
+    (is (nil? (regexp-handler* {}))))
+
   (testing "without else"
     (is (nil? ((handler/regexp #"^ping$" (constantly "pong")) {:text "text"}))))
 
