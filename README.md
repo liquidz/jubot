@@ -6,6 +6,8 @@ Chatbot framework in Clojure
 
 ## Usage
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/liquidz/jubot-sample)
+
 WORK IN PROGRESS
 
 ## License
