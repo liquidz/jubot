@@ -12,7 +12,7 @@
 
 (defn restart []
   (sys/stop)
-    (refresh :after 'user/start))
+  (refresh :after 'user/start))
 
 (defn in [s]
   ((-> sys/system :adapter :in) s))

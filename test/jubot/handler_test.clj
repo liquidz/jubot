@@ -1,7 +1,8 @@
 (ns jubot.handler-test
   (:require
-    [jubot.handler :as handler]
-    [clojure.test  :refer :all]))
+    [jubot.handler  :as handler]
+    [clojure.string :as str]
+    [clojure.test   :refer :all]))
 
 (def ^:private regexp-handler*
   (handler/regexp
@@ -86,3 +87,19 @@
          nil    "foo"
          nil    "xxx")
     (is (nil? ((handler/collect #"^foobar") {:text "foo"})))))
+
+(deftest test-help-handler-fn
+  (do (create-ns 'jubot.test.help-handler)
+      (intern 'jubot.test.help-handler
+              (with-meta 'ping-handler {:doc "pingpong handler"})
+              (constantly nil))
+      (intern 'jubot.test.help-handler
+              (with-meta 'foo-handler {:doc "foobar handler"})
+              (constantly nil))
+      (intern 'jubot.test.help-handler 'nil-handler (constantly nil)))
+
+  (let [f     (handler/help-handler-fn #"^jubot\.test\.help-handler")
+        helps (str/split-lines (f {:text "help"}))]
+    (is (seq (filter #(= % "pingpong handler") helps)))
+    (is (seq (filter #(= % "foobar handler") helps)))
+    (is (empty? (filter #(= % "") helps)))))

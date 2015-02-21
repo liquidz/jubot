@@ -6,13 +6,17 @@
     [jubot.brain     :as jb]
     [jubot.scheduler :as js]))
 
-(def dev-handler
+(defn ping-handler
+  "jubot ping - reply with 'pong'"
+  [{text :text}]
+  (if (= "ping" text) "pong"))
+
+(def ^{:doc (str "jubot set <key> <value> - fixme\n"
+                 "jubot get <key> - fixme")}
+  brain-handler
   (jh/regexp
-    #"^ping$"            (constantly "pong")
-    #"^this$"            (fn [opt] (str opt))
     #"^set (.+?) (.+?)$" (fn [{[_ k v] :match}] (jb/set k v))
-    #"^get (.+?)$"       (fn [{[_ k]   :match}] (jb/get k))
-    :else                (constantly "unknown command")))
+    #"^get (.+?)$"       (fn [{[_ k]   :match}] (jb/get k))))
 
 ;(def dev-schedule
 ;  (js/schedules

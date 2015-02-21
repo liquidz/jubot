@@ -6,7 +6,13 @@
     [conjure.core               :refer [stubbing]]
     [clojure.test               :refer :all]))
 
-(def ^:private f (jubot :handler "handler" :entries ["entries"]))
+
+(do (create-ns 'jubot.test.core.a)
+    (create-ns 'jubot.test.core.b)
+    (intern 'jubot.test.core.a 'a-handler #(if (= "test" (:text %)) "handler"))
+    (intern 'jubot.test.core.b 'b-schedule ["entries"]))
+
+(def ^:private f (jubot :ns-regexp #"^jubot\.test\.core"))
 
 (deftest test-jubot
   (stubbing [sys/start nil]
@@ -19,7 +25,8 @@
              jubot.brain.memory.MemoryBrain   (type brain)
              jubot.scheduler.Scheduler        (type scheduler)
              DEFAULT_BOTNAME                  name
-             "handler"                        handler
+             "handler"                        (handler {:text "test"})
+             nil                              (handler {})
              "entries"                        (first entries))))
 
     (testing "specify adapter and botname"
@@ -36,15 +43,7 @@
         (are [x] (some? (entries x))
              keep-awake-schedule)))
 
-    (testing "ns-regexp"
-      (do (create-ns 'jubot.test.core.a)
-          (create-ns 'jubot.test.core.b)
-          (intern 'jubot.test.core.a 'a-handler (constantly "handler"))
-          (intern 'jubot.test.core.b 'b-schedule ["entries"]))
-      (let [f (jubot :ns-regexp #"^jubot\.test\.core")
-            {:keys [adapter brain scheduler]} (do (f) sys/system)
-            {:keys [handler]} adapter
-            {:keys [entries]} scheduler]
-        (are [x y] (= x y)
-             "handler" (handler {})
-             "entries" (first entries))))))
+    (testing "built-in help handler"
+      (let [{:keys [adapter]} (do (f) sys/system)
+            {:keys [handler]} adapter]
+        (is (.startsWith (handler {:text "help"}) "Help documents:"))))))
