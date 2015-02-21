@@ -46,8 +46,6 @@
   "Returns jubot -main function.
 
   Params
-    :handler   - a handler function
-    :entries   - a sequence of schedule entries
     :ns-regexp - a regular-expression which specifies bot's namespace.
                  if a handler and entries are omitted,
                  these are collected automatically from the specified namespace.
@@ -55,14 +53,15 @@
   Return
     (fn [& args])
   "
-  [& {:keys [handler entries ns-regexp]}]
+  [& {:keys [ns-regexp]}]
   (fn [& args]
     ; require namespaces automatically
-    (when ns-regexp (jr/regexp-require ns-regexp))
+    (jr/regexp-require ns-regexp)
+
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
           {:keys [name adapter brain debug]} options
-          handler (or handler (and ns-regexp (jh/collect ns-regexp)))
-          entries (or entries (and ns-regexp (js/collect ns-regexp)))
+          handler (jh/collect ns-regexp)
+          entries (js/collect ns-regexp)
           create-system (create-system-fn
                           :name    name
                           :handler handler
