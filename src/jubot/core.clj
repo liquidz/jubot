@@ -60,8 +60,9 @@
 
     (let [{:keys [options _ _ errors]} (parse-opts args cli-options)
           {:keys [name adapter brain debug]} options
-          handler (jh/collect ns-regexp)
-          entries (js/collect ns-regexp)
+          help-handler  (jh/help-handler-fn ns-regexp)
+          handler       (jh/comp help-handler (jh/collect ns-regexp))
+          entries       (js/collect ns-regexp)
           create-system (create-system-fn
                           :name    name
                           :handler handler

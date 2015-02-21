@@ -9,7 +9,7 @@
 
 (do (create-ns 'jubot.test.core.a)
     (create-ns 'jubot.test.core.b)
-    (intern 'jubot.test.core.a 'a-handler (constantly "handler"))
+    (intern 'jubot.test.core.a 'a-handler #(if (= "test" (:text %)) "handler"))
     (intern 'jubot.test.core.b 'b-schedule ["entries"]))
 
 (def ^:private f (jubot :ns-regexp #"^jubot\.test\.core"))
@@ -25,7 +25,8 @@
              jubot.brain.memory.MemoryBrain   (type brain)
              jubot.scheduler.Scheduler        (type scheduler)
              DEFAULT_BOTNAME                  name
-             "handler"                        (handler {})
+             "handler"                        (handler {:text "test"})
+             nil                              (handler {})
              "entries"                        (first entries))))
 
     (testing "specify adapter and botname"
@@ -40,4 +41,9 @@
             {:keys [entries]} scheduler
             entries (set entries)]
         (are [x] (some? (entries x))
-             keep-awake-schedule)))))
+             keep-awake-schedule)))
+
+    (testing "built-in help handler"
+      (let [{:keys [adapter]} (do (f) sys/system)
+            {:keys [handler]} adapter]
+        (is (.startsWith (handler {:text "help"}) "Help documents:"))))))

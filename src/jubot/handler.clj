@@ -1,5 +1,6 @@
 (ns jubot.handler
   "Jubot handler utilities."
+  (:require [clojure.string :as str])
   (:refer-clojure :exclude [comp]))
 
 (def ^{:const true
@@ -77,3 +78,19 @@
   (if-let [handlers (seq (public-handlers ns-regexp))]
     (apply comp handlers)
     (constantly nil)))
+
+(defn help-handler-fn
+  "Returns handler function to show handler helps.
+
+  Params
+    :ns-regexp - a regular-expression which specifies bot's namespace.
+  Return
+    A handler function.
+  "
+  [ns-regexp]
+  (fn [{text :text}]
+    (when (= "help" text)
+      (->> (public-handlers ns-regexp)
+           (map #(-> % meta :doc))
+           (str/join "\n")
+           (str "Help documents:\n---\n")))))
