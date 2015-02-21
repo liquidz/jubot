@@ -92,5 +92,6 @@
     (when (= "help" text)
       (->> (public-handlers ns-regexp)
            (map #(-> % meta :doc))
+           (remove #(or (nil? %) (= % "")))
            (str/join "\n")
            (str "Help documents:\n---\n")))))

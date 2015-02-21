@@ -95,9 +95,11 @@
               (constantly nil))
       (intern 'jubot.test.help-handler
               (with-meta 'foo-handler {:doc "foobar handler"})
-              (constantly nil)))
+              (constantly nil))
+      (intern 'jubot.test.help-handler 'nil-handler (constantly nil)))
 
   (let [f     (handler/help-handler-fn #"^jubot\.test\.help-handler")
         helps (str/split-lines (f {:text "help"}))]
     (is (seq (filter #(= % "pingpong handler") helps)))
-    (is (seq (filter #(= % "foobar handler") helps)))))
+    (is (seq (filter #(= % "foobar handler") helps)))
+    (is (empty? (filter #(= % "") helps)))))
