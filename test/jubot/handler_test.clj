@@ -91,15 +91,20 @@
 (deftest test-help-handler-fn
   (do (create-ns 'jubot.test.help-handler)
       (intern 'jubot.test.help-handler
-              (with-meta 'ping-handler {:doc "pingpong handler"})
+              (with-meta 'ping-handler {:doc "pingpong-help
+                                              pingpong-handler"})
               (constantly nil))
       (intern 'jubot.test.help-handler
-              (with-meta 'foo-handler {:doc "foobar handler"})
+              (with-meta 'foo-handler {:doc "foobar-help
+                                             foobar-handler"})
               (constantly nil))
       (intern 'jubot.test.help-handler 'nil-handler (constantly nil)))
 
   (let [f     (handler/help-handler-fn #"^jubot\.test\.help-handler")
         helps (str/split-lines (f {:text "help"}))]
-    (is (seq (filter #(= % "pingpong handler") helps)))
-    (is (seq (filter #(= % "foobar handler") helps)))
+    (are [x] (seq (filter #(= % x) helps))
+         "pingpong-help"
+         "pingpong-handler"
+         "foobar-help"
+         "foobar-handler")
     (is (empty? (filter #(= % "") helps)))))

@@ -93,5 +93,7 @@
       (->> (public-handlers ns-regexp)
            (map #(-> % meta :doc))
            (remove #(or (nil? %) (= % "")))
+           (mapcat str/split-lines)
+           (map str/trim)
            (str/join "\n")
            (str "Help documents:\n---\n")))))
