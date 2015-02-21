@@ -11,8 +11,8 @@
   [{text :text}]
   (if (= "ping" text) "pong"))
 
-(def ^{:doc (str "jubot set <key> <value> - fixme\n"
-                 "jubot get <key> - fixme")}
+(def ^{:doc "jubot set <key> <value> - store data to brain
+             jubot get <key> - restore data from brain"}
   brain-handler
   (jh/regexp
     #"^set (.+?) (.+?)$" (fn [{[_ k v] :match}] (jb/set k v))
