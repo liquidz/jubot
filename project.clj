@@ -8,7 +8,7 @@
                  [com.stuartsierra/component  "0.2.2"]
                  [org.clojure/tools.namespace "0.2.9"]
                  [org.clojure/tools.cli       "0.3.1"]
-                 [compojure                   "1.3.1"]
+                 [compojure                   "1.3.2"]
                  [ring/ring-jetty-adapter     "1.3.2"]
                  [ring/ring-defaults          "0.1.3"]
                  [org.clojure/data.json       "0.2.5"]
