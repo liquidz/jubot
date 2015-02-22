@@ -6,6 +6,20 @@
     [conjure.core    :refer [stubbing]]
     [clojure.test    :refer :all]))
 
+(defn test-ns-fixture
+  [f]
+  (create-ns 'jubot.test.scheduler.a)
+  (create-ns 'jubot.test.scheduler.b)
+  (intern 'jubot.test.scheduler.a 'a-schedule
+          (schedule "x" (constantly "xx")))
+  (intern 'jubot.test.scheduler.b 'b-schedule
+          (schedules "y" (constantly "yy"), "z" (constantly "zz")))
+  (f)
+  (remove-ns 'jubot.test.scheduler.a)
+  (remove-ns 'jubot.test.scheduler.b))
+
+(use-fixtures :each test-ns-fixture)
+
 (deftest test-schedule
   (let [f (schedule "foo" (constantly "bar"))]
     (is (= "bar" (f)))
@@ -40,32 +54,24 @@
              (first test-entries) (first (:entries started))
              true                 (nil? (:cj stopped)))))))
 
+(deftest test-public-schedules
+  (is (= (map resolve '(jubot.test.scheduler.a/a-schedule
+                         jubot.test.scheduler.b/b-schedule))
+         (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
+               (public-schedules #"^jubot\.test\.scheduler"))))
+  (is (= (map resolve '(jubot.test.scheduler.a/a-schedule))
+         (public-schedules #"^jubot\.test\.scheduler\.a"))))
+
 (deftest test-collect
-  (do (create-ns 'jubot.test.scheduler.a)
-      (create-ns 'jubot.test.scheduler.b)
-      (intern 'jubot.test.scheduler.a 'a-schedule
-              (schedule "x" (constantly "xx")))
-      (intern 'jubot.test.scheduler.b 'b-schedule
-              (schedules "y" (constantly "yy"), "z" (constantly "zz"))))
-
-  (testing "public-schedules"
-    (is (= (map resolve '(jubot.test.scheduler.a/a-schedule
-                           jubot.test.scheduler.b/b-schedule))
-           (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
-                 (public-schedules #"^jubot\.test\.scheduler"))))
-    (is (= (map resolve '(jubot.test.scheduler.a/a-schedule))
-           (public-schedules #"^jubot\.test\.scheduler\.a"))))
-
-  (testing "collect"
-    (let [ls (sort #(.compareTo (-> %1 meta :schedule) (-> %2 meta :schedule))
-                   (collect #"^jubot\.test\.scheduler"))
-          [a b c] ls]
-      (are [x y] (= x y)
-           3    (count ls)
-           "x"  (-> a meta :schedule)
-           "xx" (a)
-           "y"  (-> b meta :schedule)
-           "yy" (b)
-           "z"  (-> c meta :schedule)
-           "zz" (c)))
-    (is (empty? (collect #"^foobar")))))
+  (let [ls (sort #(.compareTo (-> %1 meta :schedule) (-> %2 meta :schedule))
+                 (collect #"^jubot\.test\.scheduler"))
+        [a b c] ls]
+    (are [x y] (= x y)
+         3    (count ls)
+         "x"  (-> a meta :schedule)
+         "xx" (a)
+         "y"  (-> b meta :schedule)
+         "yy" (b)
+         "z"  (-> c meta :schedule)
+         "zz" (c)))
+  (is (empty? (collect #"^foobar"))))
