@@ -10,13 +10,17 @@
   [f]
   (create-ns 'jubot.test.scheduler.a)
   (create-ns 'jubot.test.scheduler.b)
+  (create-ns 'jubot.test.scheduler.b-test)
   (intern 'jubot.test.scheduler.a 'a-schedule
           (schedule "x" (constantly "xx")))
   (intern 'jubot.test.scheduler.b 'b-schedule
           (schedules "y" (constantly "yy"), "z" (constantly "zz")))
+  (intern 'jubot.test.scheduler.b-test 'must-not-be-collected-schedule
+          (schedule "z" (constantly nil)))
   (f)
   (remove-ns 'jubot.test.scheduler.a)
-  (remove-ns 'jubot.test.scheduler.b))
+  (remove-ns 'jubot.test.scheduler.b)
+  (remove-ns 'jubot.test.scheduler.b-test))
 
 (use-fixtures :each test-ns-fixture)
 

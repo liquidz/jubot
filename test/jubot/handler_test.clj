@@ -17,6 +17,7 @@
   [f]
   (create-ns 'jubot.test.handler.a)
   (create-ns 'jubot.test.handler.b)
+  (create-ns 'jubot.test.handler.b-test)
   (intern 'jubot.test.handler.a
           (with-meta 'a-handler {:doc "pingpong-help
                                        pingpong-handler"})
@@ -28,9 +29,12 @@
   (intern 'jubot.test.handler.b
           'no-doc-handler 
           (fn [{text :text}] (if (= "bar" text) "baz")))
+  (intern 'jubot.test.handler.b-test 'must-not-be-collected-handler
+          (constantly nil))
   (f)
   (remove-ns 'jubot.test.handler.a)
-  (remove-ns 'jubot.test.handler.b))
+  (remove-ns 'jubot.test.handler.b)
+  (remove-ns 'jubot.test.handler.b-test))
 
 (use-fixtures :each test-ns-fixture)
 
