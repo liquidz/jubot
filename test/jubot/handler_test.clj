@@ -13,6 +13,27 @@
     #"^get (.+?)$" (fn [{[_ x] :match}] (str "g:" x))
     :else          (constantly "error")))
 
+(defn test-ns-fixture
+  [f]
+  (create-ns 'jubot.test.handler.a)
+  (create-ns 'jubot.test.handler.b)
+  (intern 'jubot.test.handler.a
+          (with-meta 'a-handler {:doc "pingpong-help
+                                       pingpong-handler"})
+          (fn [{text :text}] (if (= "ping" text) "pong")))
+  (intern 'jubot.test.handler.b
+          (with-meta 'b-handler {:doc "foobar-help
+                                       foobar-handler"})
+          (fn [{text :text}] (if (= "foo" text) "bar")))
+  (intern 'jubot.test.handler.b
+          'no-doc-handler 
+          (fn [{text :text}] (if (= "bar" text) "baz")))
+  (f)
+  (remove-ns 'jubot.test.handler.a)
+  (remove-ns 'jubot.test.handler.b))
+
+(use-fixtures :each test-ns-fixture)
+
 (deftest test-regexp
   (testing "should work fine"
     (are [x y] (= x (regexp-handler* {:user "aa" :channel "bb" :text y}))
@@ -61,46 +82,28 @@
   (testing "invalid reg-fn-list"
     (is (thrown? AssertionError (handler/comp 'a 'b)))))
 
+(deftest test-public-handlers
+  (is (= (map resolve '(jubot.test.handler.a/a-handler
+                        jubot.test.handler.b/b-handler
+                        jubot.test.handler.b/no-doc-handler))
+         (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
+               (handler/public-handlers #"^jubot\.test\.handler"))))
+  (is (= (map resolve '(jubot.test.handler.a/a-handler))
+         (handler/public-handlers #"^jubot\.test\.handler\.a"))))
+
 (deftest test-collect
-  (do (create-ns 'jubot.test.handler.a)
-      (create-ns 'jubot.test.handler.b)
-      (intern 'jubot.test.handler.a 'a-handler
-              (fn [{text :text}] (if (= "ping" text) "pong")))
-      (intern 'jubot.test.handler.b 'b-handler
-              (fn [{text :text}] (if (= "foo" text) "bar"))))
-
-  (testing "public-handlers"
-    (is (= (map resolve '(jubot.test.handler.a/a-handler
-                          jubot.test.handler.b/b-handler))
-           (sort #(.compareTo (-> %1 meta :name) (-> %2 meta :name))
-                 (handler/public-handlers #"^jubot\.test\.handler"))))
-    (is (= (map resolve '(jubot.test.handler.a/a-handler))
-           (handler/public-handlers #"^jubot\.test\.handler\.a"))))
-
-  (testing "collect"
-    (are [x y] (= x ((handler/collect #"^jubot\.test\.handler") {:text y}))
-         "pong" "ping"
-         "bar"  "foo"
-         nil    "xxx")
-    (are [x y] (= x ((handler/collect #"^jubot\.test\.handler\.a") {:text y}))
-         "pong" "ping"
-         nil    "foo"
-         nil    "xxx")
-    (is (nil? ((handler/collect #"^foobar") {:text "foo"})))))
+  (are [x y] (= x ((handler/collect #"^jubot\.test\.handler") {:text y}))
+       "pong" "ping"
+       "bar"  "foo"
+       nil    "xxx")
+  (are [x y] (= x ((handler/collect #"^jubot\.test\.handler\.a") {:text y}))
+       "pong" "ping"
+       nil    "foo"
+       nil    "xxx")
+  (is (nil? ((handler/collect #"^foobar") {:text "foo"}))))
 
 (deftest test-help-handler-fn
-  (do (create-ns 'jubot.test.help-handler)
-      (intern 'jubot.test.help-handler
-              (with-meta 'ping-handler {:doc "pingpong-help
-                                              pingpong-handler"})
-              (constantly nil))
-      (intern 'jubot.test.help-handler
-              (with-meta 'foo-handler {:doc "foobar-help
-                                             foobar-handler"})
-              (constantly nil))
-      (intern 'jubot.test.help-handler 'nil-handler (constantly nil)))
-
-  (let [f     (handler/help-handler-fn #"^jubot\.test\.help-handler")
+  (let [f     (handler/help-handler-fn #"^jubot\.test\.handler")
         helps (str/split-lines (f {:text "help"}))]
     (are [x] (seq (filter #(= % x) helps))
          "pingpong-help"

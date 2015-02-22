@@ -62,6 +62,7 @@
   "
   [ns-regexp]
   (->> (all-ns)
+       ;(remove #(re-find #"-test$") (str (ns-name %)))
        (filter #(re-find ns-regexp (str (ns-name %))))
        (mapcat #(vals (ns-publics %)))
        (filter #(re-matches HANDLER_REGEXP (-> % meta :name str)))))
