@@ -13,6 +13,15 @@ clojure の chatbot フレームワーク
   * Redis
   * memory (for development)
 
+## なぜjubotなのか
+
+ * シンプル
+  * ハンドラーがただの関数なのでシンプル
+  * ただの関数はテストしやすい
+ * 開発しやすい
+  * repl を使った効率的な開発をサポート
+ * 拡張性
+  * component システムを使っているので拡張しやすい
 
 ## Getting Started
 
