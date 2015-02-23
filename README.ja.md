@@ -14,7 +14,7 @@ clojure の chatbot フレームワーク
   * memory (for development)
 
 
-## Getting started
+## Getting Started
 
 ```sh
 $ lein new jubot YOUR_JUBOT_PROJECT
@@ -25,36 +25,61 @@ user=> (in "jubot ping")
 
 ## ハンドラーの作成
 ### 書き方
- * 実例
+ * "ping" という入力に対して "pong" を返す
+```clj
+(defn ping-handler
+  "jubot ping - reply with 'pong'"
+  [{text :text}]
+  (if (= "ping" text) "pong"))
+```
  * 引数
-  * :text
-  * :user
+  * `:text`: 入力された文字列
+  * `:username`: 入力したユーザー名
  * docstring
+  * docstring はヘルプ表示に使われる
+```sh
+user=> (in "jubot help")
+```
 
 ### どこに書けばいいか
  * どのハンドラーが自動収集されるか
-  * どこで対象のnsが定義されるか
-  * xxx-handler が対象
-  * xxx-test というnsは対象外
+  * `YOUR_JUBOT_PROJECT.core` の `ns-prefix` にマッチする ns が対象
+  * 名前が `^.*-handler$` にマッチするパブリックな関数
+ * 例外として xxx-test という ns は `ns-prefix` にマッチしても対象外
 
 ## スケジュールの作成
 ### スケジュールの書き方
- * 実例
+ * 毎日07:00におはよう、21:00におやすみという
+```clj
+(ns foo.bar
+  (:require
+    [jubot.adapter   :as ja]
+    [jubot.scheduler :as js]))
+
+(def good-morning-schedule
+  (js/schedules
+    "0 0 7 * * * *"  #(ja/out "good morning")
+    "0 0 21 * * * *" #(ja/out "good night")))
+```
  * 引数
   * なし
  * 実行タイミングのフォーマット
-  * cronj
+  * [cronj format](http://docs.caudate.me/cronj/#crontab)
 
 ### どこに書けばいいか
  * どのスケジュールが自動的に収集されるか
-  * xxx-schedule
-  * ns はハンドラーと同じ
+  * ハンドラーと同様に `YOUR_JUBOT_PROJECT.core` の `ns-prefix` にマッチするnsが対象
+  * 名前が `^.*-schedule$` にマッチするパブリックな関数
+ * xxx-test にマッチする ns が除外されるのはハンドラー同様
 
 ## 動作確認
 ### repl での動作確認
- * start, stop, restart
- * in 関数の使い方
-  * in の定義場所(user.clj)
+ * `(start)`: jubot を起動
+ * `(stop)`: jubot を停止
+ * `(restart)`: jubot を再起動。修正されたソースは再読み込みされる
+ * in 関数
+  * repl 上で bot にメッセージを送る特殊関数
+  * dev/user.clj に定義しているので名前は自由に変更可能
 
 ## デプロイ
 ### adapter, brain の指定方法
