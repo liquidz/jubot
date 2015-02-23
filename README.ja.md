@@ -81,12 +81,36 @@ user=> (in "jubot help")
   * repl 上で bot にメッセージを送る特殊関数
   * dev/user.clj に定義しているので名前は自由に変更可能
 
+### コマンドライン引数
+ * `-a`, `--adapter`: アダプター名 (デフォルト: slack)
+  * `slack`: Slack アダプター
+  * `repl`: 開発用 repl アダプター
+ * `-b`, `--brain`: ブレイン名 (デフォルト: memory)
+  * `redis`: Redis ブレイン
+  * `memory`: 開発用 memory ブレイン
+ * `-n`, `--name`: ボット名 (デフォルト: jubot)
+
 ## デプロイ
-### adapter, brain の指定方法
- * コマンドライン引数
 
 ### heroku へのデプロイ方法
- * asleep の回避方法
-  * keep_awake
- * slack
+
+ * Procfile を必要に応じて編集
+ * heroku へデプロイ
+```
+heroku apps:create
+heroku addons:add rediscloud
+git push heroku master
+```
+ * Slack
+  * 必要な integration
+   * Outgoing WebHooks
+   * Incoming WebHooks
   * 必要な環境変数
+```
+heroku config:add SLACK_OUTGOING_TOKEN="aaa"
+heroku config:add SLACK_INCOMING_URL="bbb"
+```
+ * asleep の回避
+```
+heroku config:add AWAKE_URL="Application url on heroku"
+```
