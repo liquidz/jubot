@@ -27,7 +27,7 @@
                                        foobar-handler"})
           (fn [{text :text}] (if (= "foo" text) "bar")))
   (intern 'jubot.test.handler.b
-          'no-doc-handler 
+          'no-doc-handler
           (fn [{text :text}] (if (= "bar" text) "baz")))
   (intern 'jubot.test.handler.b-test 'must-not-be-collected-handler
           (constantly nil))

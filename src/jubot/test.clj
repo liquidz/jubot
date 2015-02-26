@@ -7,7 +7,7 @@
 
 (defmacro with-test-brain
   "Wrap body with a test memory brain.
-  
+
   Example
     (with-test-brain
       (jubot.brain/set \"foo\" \"bar\")

@@ -17,4 +17,3 @@
   keep-awake-schedule
   (js/schedule
     AWAKE_INTERVAL #(some-> AWAKE_URL_KEY getenv* client/get)))
-
