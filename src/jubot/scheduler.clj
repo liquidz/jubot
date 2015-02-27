@@ -19,11 +19,7 @@
     A schedule function.
   "
   [cron-expr f]
-  (with-meta
-    (comp
-      #(if (string? %) (ja/out %))
-      f)
-    {:schedule cron-expr}))
+  (with-meta f {:schedule cron-expr}))
 
 (defn schedules
   "Generate sequence of schedules from pairs of cronj format string and function.
@@ -36,7 +32,7 @@
   [& args]
   (map #(apply schedule %) (partition 2 args)))
 
-(defn- schedule->task
+(defn schedule->task
   "Convert a schedule function to cronj task.
 
   Params
@@ -46,7 +42,8 @@
   "
   [f]
   {:id       (str (gensym "task"))
-   :handler  (fn [t opt] (f))
+   :handler  (fn [t opt] (let [ret (f)]
+                           (if (string? ret) (ja/out ret))))
    :schedule (-> f meta :schedule)})
 
 (defrecord Scheduler [cj entries]
