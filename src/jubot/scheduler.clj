@@ -2,7 +2,8 @@
   "Jubot scheduler."
   (:require
     [com.stuartsierra.component :as component]
-    [cronj.core :as c]))
+    [jubot.adapter :as ja]
+    [cronj.core    :as c]))
 
 (def ^{:const true
        :doc "The regular expression for collecting schedules automatically."}
@@ -18,7 +19,11 @@
     A schedule function.
   "
   [cron-expr f]
-  (with-meta f {:schedule cron-expr}))
+  (with-meta
+    (comp
+      #(if (string? %) (ja/out %))
+      f)
+    {:schedule cron-expr}))
 
 (defn schedules
   "Generate sequence of schedules from pairs of cronj format string and function.

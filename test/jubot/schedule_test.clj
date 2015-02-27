@@ -2,6 +2,7 @@
   (:require
     [com.stuartsierra.component :as component]
     [jubot.scheduler :refer :all]
+    [jubot.adapter   :as ja]
     [cronj.core      :as c]
     [conjure.core    :refer [stubbing]]
     [clojure.test    :refer :all]))
@@ -25,18 +26,26 @@
 (use-fixtures :each test-ns-fixture)
 
 (deftest test-schedule
-  (let [f (schedule "foo" (constantly "bar"))]
-    (is (= "bar" (f)))
-    (is (= "foo" (-> f meta :schedule)))))
+  (testing "function that returns string"
+    (stubbing [ja/out #(str "[" % "]")]
+      (let [f (schedule "foo" (constantly "bar"))]
+        (is (= "[bar]" (f)))
+        (is (= "foo" (-> f meta :schedule))))))
+
+  (testing "fixme"
+    (stubbing [ja/out #(throw (Exception. "should not be called"))]
+      (let [f (schedule "foo" (constantly [1 2 3]))]
+        (is (nil? (f)))))))
 
 (deftest test-schedules
-  (let [fs (schedules "foo" (constantly "bar")
-                      "bar" (constantly "baz"))]
-    (are [x y] (= x y)
-         "bar" ((first fs))
-         "foo" (-> fs first meta :schedule)
-         "baz" ((second fs))
-         "bar" (-> fs second meta :schedule))))
+  (stubbing [ja/out #(str "[" % "]")]
+    (let [fs (schedules "foo" (constantly "bar")
+                        "bar" (constantly "baz"))]
+      (are [x y] (= x y)
+           "[bar]" ((first fs))
+           "foo"   (-> fs first meta :schedule)
+           "[baz]" ((second fs))
+           "bar"   (-> fs second meta :schedule)))))
 
 (def ^:private test-entries
   (schedules "foo" (constantly "bar")))
@@ -67,15 +76,16 @@
          (public-schedules #"^jubot\.test\.scheduler\.a"))))
 
 (deftest test-collect
-  (let [ls (sort #(.compareTo (-> %1 meta :schedule) (-> %2 meta :schedule))
-                 (collect #"^jubot\.test\.scheduler"))
-        [a b c] ls]
-    (are [x y] (= x y)
-         3    (count ls)
-         "x"  (-> a meta :schedule)
-         "xx" (a)
-         "y"  (-> b meta :schedule)
-         "yy" (b)
-         "z"  (-> c meta :schedule)
-         "zz" (c)))
+  (stubbing [ja/out identity]
+    (let [ls (sort #(.compareTo (-> %1 meta :schedule) (-> %2 meta :schedule))
+                   (collect #"^jubot\.test\.scheduler"))
+          [a b c] ls]
+      (are [x y] (= x y)
+           3    (count ls)
+           "x"  (-> a meta :schedule)
+           "xx" (a)
+           "y"  (-> b meta :schedule)
+           "yy" (b)
+           "z"  (-> c meta :schedule)
+           "zz" (c))))
   (is (empty? (collect #"^foobar"))))
