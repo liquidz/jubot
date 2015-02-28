@@ -6,21 +6,22 @@
 ![jubot](resources/jubot.png)
 **Chatbot framework in Clojure.**
 
-Jubot supports following adapters and brains:
+Currently, jubot supports following adapters and brains:
 
  * Adapter
-  * Slack
+  * [Slack](https://slack.com/)
  * Brain
-  * Redis
+  * [Redis](http://redis.io/)
 
 ## Why jubot?
 
  * Simplicity
-  * Handlers are simple functions, and these are **testable**.
+  * Handlers are simple functions, and these are **TESTABLE**.
  * Efficiency
-  * Supports development in REPL.
+  * Supports REPL friendly development that you love.
  * Extensibility
-  * Easy to exntend system because of [stuartsierra/component](https://github.com/stuartsierra/component).
+  * Easy to exntend system because jubot uses [stuartsierra/component](https://github.com/stuartsierra/component) as a component system.
+
 
 ## Getting Started
 
@@ -30,6 +31,7 @@ $ cd YOUR_JUBOT_PROJECT
 $ lein repl
 user=> (in "jubot help")
 ```
+
 
 ## Handlers
 
@@ -70,6 +72,7 @@ Developers do not need to specify which handlers are used, because jubot collect
   * `ns-prefix` is a namespace regular expression. It is defined in `YOUR_JUBOT_PROJECT.core`.
   * However, namespaces that matches `/^.*-test$/` is excluded.
 
+
 ## Schedules
 Schedule is a function that is called periodically as a cron.
 
@@ -77,17 +80,17 @@ Schedule is a function that is called periodically as a cron.
 ```clj
 (ns foo.bar
   (:require
-    [jubot.adapter   :as ja]
     [jubot.scheduler :as js]))
 
 (def good-morning-schedule
   (js/schedules
-    "0 0 7 * * * *"  #(ja/out "good morning")
-    "0 0 21 * * * *" #(ja/out "good night")))
+    "0 0 7 * * * *"  (fn [] "good morning")
+    "0 0 21 * * * *" (fn [] "good night")))
 ```
  * Use [`scheduler/schedule`](http://liquidz.github.io/jubot/api/jubot.scheduler.html#var-schedule) or [`scheduler/schedules`](http://liquidz.github.io/jubot/api/jubot.scheduler.html#var-schedules) to define one or more schedules.
+  * If the function returns string, jubot sends the string to adapter as a message. In other words, jubot does nothing when the function returns other than string.
  * Scheduling format
-  * See details: [cronj format](http://docs.caudate.me/cronj/#crontab)
+  * Jubot uses [cronj](https://github.com/zcaudate/cronj) for scheduling tasks, and scheduling format's details is here: [cronj format](http://docs.caudate.me/cronj/#crontab)
 
 ### Which schedules are collected automatically
 As same as handler section, jubot collects schedule functions automatically.
@@ -123,7 +126,7 @@ user=> (in "jubot ping")
 
 ## Deploy to Heroku
  1. Edit `Procfile` as you want
- 1. Create and deploy
+ 1. Create and deploy (the following sample uses Redis as a brain)
 ```sh
 heroku apps:create
 heroku addons:add rediscloud
