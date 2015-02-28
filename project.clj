@@ -1,4 +1,4 @@
-(defproject jubot "0.0.1-SNAPSHOT"
+(defproject jubot "0.0.1"
   :description "Chatbot framework in Clojure"
   :url "https://github.com/liquidz/jubot"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,7 @@
 
   :dependencies [[org.clojure/clojure         "1.6.0"]
                  [com.stuartsierra/component  "0.2.2"]
-                 [org.clojure/tools.namespace "0.2.9"]
+                 [org.clojure/tools.namespace "0.2.10"]
                  [org.clojure/tools.cli       "0.3.1"]
                  [compojure                   "1.3.2"]
                  [ring/ring-jetty-adapter     "1.3.2"]
