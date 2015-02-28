@@ -24,6 +24,7 @@
 
   :codox {:exclude [user dev]
           :src-dir-uri "http://github.com/liquidz/jubot/blob/master/"
-          :src-linenum-anchor-prefix "L"}
+          :src-linenum-anchor-prefix "L"
+          :output-dir "doc/api"}
 
   :aliases {"dev" ["run" "-m" "dev/-main"]})
