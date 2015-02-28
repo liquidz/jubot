@@ -2,7 +2,8 @@
   "Jubot scheduler."
   (:require
     [com.stuartsierra.component :as component]
-    [cronj.core :as c]))
+    [jubot.adapter :as ja]
+    [cronj.core    :as c]))
 
 (def ^{:const true
        :doc "The regular expression for collecting schedules automatically."}
@@ -31,7 +32,7 @@
   [& args]
   (map #(apply schedule %) (partition 2 args)))
 
-(defn- schedule->task
+(defn schedule->task
   "Convert a schedule function to cronj task.
 
   Params
@@ -41,7 +42,8 @@
   "
   [f]
   {:id       (str (gensym "task"))
-   :handler  (fn [t opt] (f))
+   :handler  (fn [t opt] (let [ret (f)]
+                           (if (string? ret) (ja/out ret))))
    :schedule (-> f meta :schedule)})
 
 (defrecord Scheduler [cj entries]

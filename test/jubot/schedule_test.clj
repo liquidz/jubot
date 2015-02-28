@@ -2,6 +2,7 @@
   (:require
     [com.stuartsierra.component :as component]
     [jubot.scheduler :refer :all]
+    [jubot.adapter   :as ja]
     [cronj.core      :as c]
     [conjure.core    :refer [stubbing]]
     [clojure.test    :refer :all]))
@@ -37,6 +38,23 @@
          "foo" (-> fs first meta :schedule)
          "baz" ((second fs))
          "bar" (-> fs second meta :schedule))))
+
+(deftest test-schedule->task
+  (testing "return string"
+    (stubbing [ja/out #(str "[" % "]")]
+      (let [s (schedule "foo" (constantly "bar"))
+            t (schedule->task s)]
+        (are [x y] (= x y)
+             "foo"   (:schedule t)
+             "[bar]" ((:handler t) nil nil)))))
+
+  (testing "not return string"
+    (stubbing [ja/out (fn [_] (throw (Exception. "must not be called")))]
+      (let [s (schedule "foo" (constantly [1 2 3]))
+            t (schedule->task s)]
+        (are [x y] (= x y)
+             "foo" (:schedule t)
+             nil   ((:handler t) nil nil))))))
 
 (def ^:private test-entries
   (schedules "foo" (constantly "bar")))

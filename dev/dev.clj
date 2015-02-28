@@ -20,6 +20,6 @@
 
 ;(def dev-schedule
 ;  (js/schedules
-;    "/5 * * * * * *" #(ja/out "KITERU")))
+;    "/5 * * * * * *" #(str "Hey!")))
 
 (def -main (jubot :ns-regexp #"^dev"))
