@@ -2,7 +2,6 @@
   (:require
     [jubot.scheduler.keep-awake :refer :all]
     [jubot.redef                :refer :all]
-    [jubot.adapter              :as ja]
     [clojure.test               :refer :all]
     [conjure.core               :refer [stubbing]]
     [clj-http.lite.client       :as client]))

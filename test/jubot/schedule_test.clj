@@ -26,10 +26,9 @@
 (use-fixtures :each test-ns-fixture)
 
 (deftest test-schedule
-  (testing "function that returns string"
-    (let [f (schedule "foo" (constantly "bar"))]
-      (is (= "bar" (f)))
-      (is (= "foo" (-> f meta :schedule))))))
+  (let [f (schedule "foo" (constantly "bar"))]
+    (is (= "bar" (f)))
+    (is (= "foo" (-> f meta :schedule)))))
 
 (deftest test-schedules
   (let [fs (schedules "foo" (constantly "bar")
