@@ -46,4 +46,5 @@
     (testing "built-in help handler"
       (let [{:keys [adapter]} (do (f) sys/system)
             {:keys [handler]} adapter]
-        (is (.startsWith (handler {:text "help"}) "Help documents:"))))))
+        (is (.startsWith (handler {:message-for-me? true :text "help"})
+                         "Help documents:"))))))

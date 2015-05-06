@@ -8,16 +8,16 @@
   HANDLER_REGEXP #"^.*-handler$")
 
 (defn regexp
-  "Generate a handler function from pair of regular expression and function.
-  FIXME
+  "Choose and call handler function by specified regular expression.
 
   Params
+    option      - An argument that is passed to original handler function.
     reg-fn-list - Pair of regular expression and function.
                   If the regular expression is matched, the paired function is called.
                   In addition to original handler input,
-                  `re-find` result will be passed to the paired function.
+                  `re-find` result will be passed to the paired function with `match` key.
   Return
-    A handler function.
+    Result of a chosen handler function.
   "
   [{:keys [text] :as option} & reg-fn-list]
   {:pre [(zero? (mod (count reg-fn-list) 2))]}
@@ -88,8 +88,8 @@
     A handler function.
   "
   [ns-regexp]
-  (fn [{text :text}]
-    (when (= "help" text)
+  (fn [{text :text, forme? :message-for-me?}]
+    (when (and forme? (= "help" text))
       (->> (public-handlers ns-regexp)
            (map #(-> % meta :doc))
            (remove #(or (nil? %) (= % "")))

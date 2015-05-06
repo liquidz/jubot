@@ -110,7 +110,7 @@
 
 (deftest test-help-handler-fn
   (let [f     (handler/help-handler-fn #"^jubot\.test\.handler")
-        helps (str/split-lines (f {:text "help"}))]
+        helps (str/split-lines (f {:message-for-me? true :text "help"}))]
     (are [x] (seq (filter #(= % x) helps))
          "pingpong-help"
          "pingpong-handler"

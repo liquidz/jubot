@@ -38,15 +38,20 @@ user=> (in "jubot help")
 Handler is a function to process user input.
 
 ### Ping pong example:
+
+**NOTE:** This example will response for any addresses because example code does not check `:message-for-me?`.
+
 ```clj
 (defn ping-handler
   "jubot ping - reply with 'pong'"
-  [{text :text}]
+  [{:keys [text]}]
   (if (= "ping" text) "pong"))
 ```
  * Arguments
   * `:username`: User name
   * `:text`: Input string.
+  * `:to`: Address username.
+  * `:message-for-me?`: Is inputted message addredded to bot or not.
  * Document string
   * Document string will be shown in chatbot help.
 ```clj
@@ -60,11 +65,13 @@ Or you can use [`handler/regexp`](http://liquidz.github.io/jubot/api/jubot.handl
   (:require
     [jubot.handler :as jh]))
 
-(jh/regexp
-  #"^ping$" (constantly "pong"))
+(defn ping-handler
+  [arg]
+  (jh/regexp arg
+    #"^ping$" (constantly "pong")))
 ```
 
-### Which handlers are collected automatically
+### Which handlers are collected automatically?
 
 Developers do not need to specify which handlers are used, because jubot collects handler functions automatically.
 
@@ -92,14 +99,16 @@ Schedule is a function that is called periodically as a cron.
  * Scheduling format
   * Jubot uses [cronj](https://github.com/zcaudate/cronj) for scheduling tasks, and scheduling format's details is here: [cronj format](http://docs.caudate.me/cronj/#crontab)
 
-### Which schedules are collected automatically
+### Which schedules are collected automatically?
 As same as handler section, jubot collects schedule functions automatically.
+
  * Public schedule funtion that matches `/^.*-schedule$/` in `ns-prefix` will be collected automatically.
  * Test namespaces that matches `/^.*-test$/` are excluded.
 
 ## Development in REPL
 Jubot provides some useful funcition to develop chatbot in REPL efficiently.
 These functions are defined in `dev/user.clj`.
+
 ```clj
 user=> (start)   ; start jubot system
 user=> (stop)    ; stop jubot system
