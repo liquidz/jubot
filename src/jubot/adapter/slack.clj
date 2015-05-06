@@ -3,7 +3,7 @@
   https://slack.com/
   "
   (:require
-    [jubot.adapter.util :refer [text-to-bot]]
+    [jubot.adapter.util :refer :all]
     [jubot.redef :refer :all]
     [com.stuartsierra.component :as component]
     [ring.adapter.jetty       :refer [run-jetty]]
@@ -84,10 +84,10 @@
     (or (some->> text
                  (not-from-slackbot user_name)
                  (valid-outgoing-token token)
-                 (text-to-bot botname)
-                 (assoc option :text)
+                 (parse-text botname)
+                 (merge option)
                  handler-fn
-                 (str user_name ": ")
+                 (str "@" user_name " ")
                  (hash-map :username botname :text)
                  json/write-str)
         "")))
