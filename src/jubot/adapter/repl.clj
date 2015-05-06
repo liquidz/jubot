@@ -28,7 +28,7 @@
     s          - Input text from REPL.
   "
   [{:keys [name handler] :as this} s]
-  (let [option {:user username :channel nil}]
+  (let [option {:username username :channel nil}]
     (some->> s
              (parse-text name)
              (merge option)
