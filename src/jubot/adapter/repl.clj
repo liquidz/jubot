@@ -30,8 +30,8 @@
   [{:keys [name handler] :as this} s]
   (let [option {:user username :channel nil}]
     (some->> s
-             (text-to-bot name)
-             (assoc option :text)
+             (parse-text name)
+             (merge option)
              handler
              (process-output this))))
 

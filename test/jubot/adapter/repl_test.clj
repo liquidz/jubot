@@ -7,8 +7,9 @@
     [clojure.test       :refer :all]))
 
 (def ^:private botname "test")
-(def ^:private handler (fn [{:keys [user channel text]}]
-                         (str "user=" user ",channel=" channel ",text=" text)))
+(def ^:private handler (fn [{:keys [user channel text message-for-me?]}]
+                         (when message-for-me?
+                           (str "user=" user ",channel=" channel ",text=" text))))
 (def ^:private adapter (map->ReplAdapter {:name botname :handler handler}))
 (def ^:private process-output* (partial process-output adapter))
 (def ^:private process-input*  (partial process-input adapter))

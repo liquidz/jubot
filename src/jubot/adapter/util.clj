@@ -17,3 +17,15 @@
         len    (count prefix)]
     (if (and (string? text) (.startsWith text prefix))
       (str/join (drop len text)))))
+
+(defn parse-text
+  "FIXME"
+  [botname text]
+  (let [[head tail] (some-> text (str/split #"\s+" 2))
+        fuzzy?      (nil? (->> head str (re-find #"[@:]")))
+        name        (some->> head str (re-find #"^@?(.+?):?$") second)
+        forme?      (= botname name)]
+    (merge {:message-for-me? forme?}
+           (if (and name (not (and (not forme?) fuzzy?)))
+             {:to name :text tail}
+             {:text text}))))
