@@ -49,13 +49,18 @@
   "Process output to Slack.
 
   Params
-    this - Slack adapter.
-    text - Output text to Slack.
+    this        - Slack adapter.
+      :name     - Bot's name.
+    text        - Output text to Slack.
+    option
+      :as       - Overwrite bot's name if you specify this option.
+      :icon-url - Customized icon URL.
   "
-  [this text]
+  [this text & {:keys [as icon-url]}]
   (let [url     (getenv* INCOMING_URL_KEY)
-        payload {:text text
-                 :username (:name this)}]
+        name    (or as (:name this))
+        payload {:text text :username name}
+        payload (merge payload (if icon-url {:icon_url icon-url} {}))]
     (when url
       (client/post url {:form-params {:payload (json/write-str payload)}}))))
 
@@ -76,6 +81,8 @@
        :team_domain  \"uochan\",
        :timestamp    \"1422058599.000004\",
        :text         \"foo bar\"}
+  Return
+    JSON string or empty string.
   "
   [this handler-fn params]
   (let [{:keys [token user_name channel_name text]} params

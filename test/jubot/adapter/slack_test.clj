@@ -73,7 +73,18 @@
 
   (testing "INCOMING_URL_KEY is not defined"
     (stubbing [getenv* nil]
-      (is (nil? (process-output* "foo"))))))
+      (is (nil? (process-output* "foo")))))
+
+  (testing "specify bot-name and icon-url"
+    (stubbing [getenv* "localhost", post list]
+      (let [f #(-> (apply process-output* %&) second :form-params :payload
+                   (json/read-str :key-fn keyword))
+            text     "text"
+            newname  "bar"
+            icon-url "http://localhost/baz.png"]
+        (is (= {:username newname :text text} (f text :as newname)))
+        (is (= {:username newname :icon_url icon-url :text text}
+               (f text :as newname :icon-url icon-url)))))))
 
 (deftest test-app
   (testing "get"

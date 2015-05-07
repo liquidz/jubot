@@ -3,20 +3,21 @@
 </pre></div><div class="public anchor" id="var-create-brain"><h3>create-brain</h3><div class="usage"><code>(create-brain {:keys [brain], :as config-option})</code></div><div class="doc"><pre class="plaintext">Create the specified brain.
 
 Params
-  :brain - a brain&apos;s name
+  config-option
+    :brain - A brain&apos;s name.
 Return
-  brain component
+  Brain component.
 </pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/brain.clj#L9">view source</a></div></div><div class="public anchor" id="var-get"><h3>get</h3><div class="usage"><code>(get k)</code></div><div class="doc"><pre class="plaintext">Get data from system brain.
 Before using this function, jubot.system should be started.
 
 Params
-  k - key
+  k - Data key.
 Return
-  stored data
-</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/brain.clj#L33">view source</a></div></div><div class="public anchor" id="var-set"><h3>set</h3><div class="usage"><code>(set k v)</code></div><div class="doc"><pre class="plaintext">Store data to system brain.
+  Stored data.
+</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/brain.clj#L34">view source</a></div></div><div class="public anchor" id="var-set"><h3>set</h3><div class="usage"><code>(set k v)</code></div><div class="doc"><pre class="plaintext">Store data to system brain.
 Before using this function, jubot.system should be started.
 
 Params
-  k - key
-  v - value
-</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/brain.clj#L22">view source</a></div></div></div></body></html>
+  k - Data key.
+  v - Data value.
+</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/brain.clj#L23">view source</a></div></div></div></body></html>

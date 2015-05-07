@@ -20,6 +20,11 @@
       #"^set (.+?) (.+?)$" (fn [{[_ k v] :match}] (jb/set k v))
       #"^get (.+?)$"       (fn [{[_ k]   :match}] (jb/get k)))))
 
+(defn hear-handler
+  [{:keys [text user]}]
+  (when (re-find #"hello" text)
+    (ja/out (str "hello " user) :as "world")))
+
 ;(def dev-schedule
 ;  (js/schedules
 ;    "/5 * * * * * *" #(str "Hey!")))

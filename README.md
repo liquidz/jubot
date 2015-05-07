@@ -48,7 +48,7 @@ Handler is a function to process user input.
   (if (= "ping" text) "pong"))
 ```
  * Arguments
-  * `:username`: User name
+  * `:user`: User name
   * `:text`: Input string.
   * `:to`: Address username.
   * `:message-for-me?`: Is inputted message addredded to bot or not.

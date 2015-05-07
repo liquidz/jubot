@@ -5,18 +5,22 @@
     [jubot.redef        :refer :all]
     [com.stuartsierra.component :as component]))
 
-(def ^{:doc "User name. (default is \"nobody\")"}
+(def ^{:doc "User name. (default value is \"nobody\")"}
   username (or (getenv* "USER") "nobody"))
 
 (defn process-output
   "Process output to REPL.
 
   Params
-    :name - Bot's name.
-    s     - Output text to REPL.
+    this    - REPL adapter.
+      :name - Bot's name.
+    s       - Output text to REPL.
+    option
+      :as   - Overwrite bot's name if you specify this option.
   "
-  [{:keys [name]} s]
-  (println* (str name "=> " s)))
+  [this s & {:keys [as] :as option}]
+  (let [name (or as (:name this))]
+    (println* (str name "=> " s))))
 
 (defn process-input
   "Process input from REPL.
@@ -28,7 +32,7 @@
     s          - Input text from REPL.
   "
   [{:keys [name handler] :as this} s]
-  (let [option {:username username :channel nil}]
+  (let [option {:user username :channel nil}]
     (some->> s
              (parse-text name)
              (merge option)

@@ -7,21 +7,23 @@
     [clojure.test       :refer :all]))
 
 (def ^:private botname "test")
-(def ^:private handler (fn [{:keys [username channel text message-for-me?]}]
+(def ^:private handler (fn [{:keys [user channel text message-for-me?]}]
                          (when message-for-me?
-                           (str "username=" username ",channel=" channel ",text=" text))))
+                           (str "user=" user ",channel=" channel ",text=" text))))
 (def ^:private adapter (map->ReplAdapter {:name botname :handler handler}))
 (def ^:private process-output* (partial process-output adapter))
 (def ^:private process-input*  (partial process-input adapter))
 
 (deftest test-process-output
   (stubbing [println* identity]
-    (is (= "test=> foo" (process-output* "foo")))))
+    (are [x y] (= x y)
+      "test=> foo" (process-output* "foo")
+      "bar=> foo"  (process-output* "foo" :as "bar"))))
 
 (deftest test-process-input
   (stubbing [println* identity]
     (is (nil? (process-input* "foo")))
-    (is (= (str botname "=> username=" username ",channel=,text=foo")
+    (is (= (str botname "=> user=" username ",channel=,text=foo")
            (process-input* (str botname " foo"))))))
 
 (deftest test-ReplAdapter

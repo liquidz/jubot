@@ -3,14 +3,17 @@
 </pre></div><div class="public anchor" id="var-create-adapter"><h3>create-adapter</h3><div class="usage"><code>(create-adapter {:keys [adapter], :as config-option})</code></div><div class="doc"><pre class="plaintext">Create the specified adapter.
 
 Params
-  :adapter - a adapter name
+  config-option
+    :adapter - A adapter name.
 Return
-  adapter component
-</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/adapter.clj#L8">view source</a></div></div><div class="public anchor" id="var-out"><h3>out</h3><div class="usage"><code>(out s)</code></div><div class="doc"><pre class="plaintext">Call output function in system adapter.
+  Adapter component.
+</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/adapter.clj#L8">view source</a></div></div><div class="public anchor" id="var-out"><h3>out</h3><div class="usage"><code>(out s &amp; option)</code></div><div class="doc"><pre class="plaintext">Call output function in system adapter.
 Before using this function, jubot.system should be started.
 
 Params
-  s - a message string
+  s      - A message string.
+  option - Output option map.
+           See REPL or Slack adapter documents.
 Return
-  nil
-</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/adapter.clj#L21">view source</a></div></div></div></body></html>
+  nil.
+</pre></div><div class="src-link"><a href="http://github.com/liquidz/jubot/blob/master/src/jubot/adapter.clj#L22">view source</a></div></div></div></body></html>
