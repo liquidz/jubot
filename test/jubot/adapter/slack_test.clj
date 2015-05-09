@@ -14,7 +14,7 @@
 (def ^:private botname "test")
 (def ^:private handler (fn [{:keys [user channel text message-for-me?]}]
                          (when message-for-me?
-                           (str "channel=" channel ",text=" text))))
+                           (str "user=" user ",channel=" channel ",text=" text))))
 (def ^:private nil-handler (constantly nil))
 (def ^:private adapter (map->SlackAdapter {:name botname}))
 (def ^:private process-input* (partial process-input adapter))
@@ -55,7 +55,7 @@
     (is (= "" (process-input* nil-handler {:text (str botname " foo")}))))
 
   (testing "handler function returns string"
-    (is (= {:username botname :text "@aaa channel=bbb,text=ccc"}
+    (is (= {:username botname :text "@aaa user=aaa,channel=bbb,text=ccc"}
            (json/read-str
              (process-input* handler {:text (str botname " ccc")
                                       :user_name "aaa"
