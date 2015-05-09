@@ -9,7 +9,7 @@
     [ring.adapter.jetty       :refer [run-jetty]]
     [ring.middleware.defaults :refer :all]
     [compojure.core           :refer [defroutes GET POST]]
-    [compojure.route          :refer [not-found]]
+    [compojure.route          :refer [files not-found]]
     [clojure.data.json        :as    json]
     [clj-http.lite.client     :as    client]))
 
@@ -105,6 +105,7 @@
          " bot's name is \"" (:name adapter) "\"."))
   (POST "/" {:keys [adapter handler-fn params]}
     (process-input adapter handler-fn params))
+  (files "/static" {:root "static"})
   (not-found "page not found"))
 
 (defn wrap-adapter
