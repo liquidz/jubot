@@ -9,9 +9,10 @@
   "Create the specified adapter.
 
   Params
-    :adapter - a adapter name
+    config-option
+      :adapter - A adapter name.
   Return
-    adapter component
+    Adapter component.
   "
   [{:keys [adapter] :as config-option}]
   (case adapter
@@ -23,9 +24,11 @@
   Before using this function, jubot.system should be started.
 
   Params
-    s - a message string
+    s      - A message string.
+    option - Output option map.
+             See REPL or Slack adapter documents.
   Return
-    nil
+    nil.
   "
-  [s]
-  (some-> system :adapter :out (as-> f (f s))))
+  [s & option]
+  (some-> system :adapter :out (as-> f (apply f s option))))

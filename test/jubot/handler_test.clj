@@ -4,8 +4,10 @@
     [clojure.string :as str]
     [clojure.test   :refer :all]))
 
-(def ^:private regexp-handler*
+(defn- regexp-handler*
+  [arg]
   (handler/regexp
+    arg
     #"^ping$"      (constantly "pong")
     #"^opt$"       (fn [{:keys [user channel]}]
                      (str "u=" user ",c=" channel))
@@ -51,13 +53,13 @@
     (is (nil? (regexp-handler* {}))))
 
   (testing "without else"
-    (is (nil? ((handler/regexp #"^ping$" (constantly "pong")) {:text "text"}))))
+    (is (nil? (handler/regexp {:text "text"} #"^ping$" (constantly "pong")))))
 
   (testing "empty reg-fn-list"
-    (is (nil? ((handler/regexp) {:text "text"}))))
+    (is (nil? (handler/regexp {:text "text"}))))
 
   (testing "invalid reg-fn-list"
-    (is (thrown? AssertionError ((handler/regexp :lonely) {:text "text"})))))
+    (is (thrown? AssertionError (handler/regexp {:text "text"} :lonely)))))
 
 (deftest test-comp
   (testing "handler composition"
@@ -108,7 +110,7 @@
 
 (deftest test-help-handler-fn
   (let [f     (handler/help-handler-fn #"^jubot\.test\.handler")
-        helps (str/split-lines (f {:text "help"}))]
+        helps (str/split-lines (f {:message-for-me? true :text "help"}))]
     (are [x] (seq (filter #(= % x) helps))
          "pingpong-help"
          "pingpong-handler"

@@ -12,8 +12,9 @@
     [ring.mock.request    :refer [request]]))
 
 (def ^:private botname "test")
-(def ^:private handler (fn [{:keys [user channel text]}]
-                         (str "channel=" channel ",text=" text)))
+(def ^:private handler (fn [{:keys [user channel text message-for-me?]}]
+                         (when message-for-me?
+                           (str "user=" user ",channel=" channel ",text=" text))))
 (def ^:private nil-handler (constantly nil))
 (def ^:private adapter (map->SlackAdapter {:name botname}))
 (def ^:private process-input* (partial process-input adapter))
@@ -54,13 +55,12 @@
     (is (= "" (process-input* nil-handler {:text (str botname " foo")}))))
 
   (testing "handler function returns string"
-    (is (= {:username botname :text "aaa: channel=bbb,text=ccc"}
+    (is (= {:username botname :text "@aaa user=aaa,channel=bbb,text=ccc"}
            (json/read-str
              (process-input* handler {:text (str botname " ccc")
                                       :user_name "aaa"
                                       :channel_name "bbb"})
              :key-fn keyword)))))
-
 
 (deftest test-process-output
   (testing "should work fine"
@@ -73,7 +73,18 @@
 
   (testing "INCOMING_URL_KEY is not defined"
     (stubbing [getenv* nil]
-      (is (nil? (process-output* "foo"))))))
+      (is (nil? (process-output* "foo")))))
+
+  (testing "specify bot-name and icon-url"
+    (stubbing [getenv* "localhost", post list]
+      (let [f #(-> (apply process-output* %&) second :form-params :payload
+                   (json/read-str :key-fn keyword))
+            text     "text"
+            newname  "bar"
+            icon-url "http://localhost/baz.png"]
+        (is (= {:username newname :text text} (f text :as newname)))
+        (is (= {:username newname :icon_url icon-url :text text}
+               (f text :as newname :icon-url icon-url)))))))
 
 (deftest test-app
   (testing "get"
@@ -81,15 +92,16 @@
 
   (testing "post"
     (let [param {:foo "bar"}
-          app   (-> app
+          app*  (-> app
                     (wrap-defaults api-defaults)
                     (wrap-adapter "adapter" "handler"))]
       (stubbing [process-input list]
         (is (= ["adapter" "handler" param]
-               (-> (request :post "/" param) app :body)))))))
+               (-> (request :post "/" param) app* :body)))))))
 
 (deftest test-SlackAdapter
-  (stubbing [run-jetty "jetty"]
+  (stubbing [run-jetty "jetty"
+             println   nil]
     (testing "start adapter"
       (let [adapter (component/start adapter)]
         (are [x y] (= x y)

@@ -10,9 +10,10 @@
   "Create the specified brain.
 
   Params
-    :brain - a brain's name
+    config-option
+      :brain - A brain's name.
   Return
-    brain component
+    Brain component.
   "
   [{:keys [brain] :as config-option}]
   (case brain
@@ -24,8 +25,8 @@
   Before using this function, jubot.system should be started.
 
   Params
-    k - key
-    v - value
+    k - Data key.
+    v - Data value.
   "
   [k v]
   (some-> system :brain :set (as-> f (f k v))))
@@ -35,9 +36,9 @@
   Before using this function, jubot.system should be started.
 
   Params
-    k - key
+    k - Data key.
   Return
-    stored data
+    Stored data.
   "
   [k]
   (some-> system :brain :get (as-> f (f k))))
