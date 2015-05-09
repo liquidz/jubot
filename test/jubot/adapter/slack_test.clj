@@ -92,15 +92,16 @@
 
   (testing "post"
     (let [param {:foo "bar"}
-          app   (-> app
+          app*  (-> app
                     (wrap-defaults api-defaults)
                     (wrap-adapter "adapter" "handler"))]
       (stubbing [process-input list]
         (is (= ["adapter" "handler" param]
-               (-> (request :post "/" param) app :body)))))))
+               (-> (request :post "/" param) app* :body)))))))
 
 (deftest test-SlackAdapter
-  (stubbing [run-jetty "jetty"]
+  (stubbing [run-jetty "jetty"
+             println   nil]
     (testing "start adapter"
       (let [adapter (component/start adapter)]
         (are [x y] (= x y)

@@ -4,7 +4,8 @@
   (:refer-clojure :exclude [comp]))
 
 (def ^{:const true
-       :doc "The handler name regular expression for collecting handler functions automatically."}
+       :doc "The handler name regular expression
+            for collecting handler functions automatically."}
   HANDLER_REGEXP #"^.*-handler$")
 
 (defn regexp
@@ -13,9 +14,12 @@
   Params
     option      - An argument that is passed to original handler function.
     reg-fn-list - Pair of regular expression and function.
-                  If the regular expression is matched, the paired function is called.
+                  The paired function is called,
+                  if the regular expression is matched.
+
                   In addition to original handler input,
-                  `re-find` result will be passed to the paired function with `match` key.
+                  `re-find` result will be passed to
+                  the paired function with `match` key.
   Return
     Result of a chosen handler function.
   "
