@@ -2,11 +2,14 @@
   (:require
     [com.stuartsierra.component :as component]
     [jubot.brain.redis :refer :all]
+    [taoensso.timbre      :as timbre]
     [taoensso.carmine  :as car]
     [conjure.core      :refer [stubbing]]
     [clojure.test      :refer :all]))
 
 (def ^:private brain (map->RedisBrain {}))
+(timbre/set-config!
+  [:appenders :standard-out :enabled?] false)
 
 (deftest test-RedisBrain
   (testing "start brain"
@@ -30,9 +33,16 @@
     (is (= "foo" (-> (map->RedisBrain {:uri "foo"})
                      component/start :conn :spec :uri))))
 
-  (testing "set/get"
+  (testing "set/get/keys"
     (let [brain (-> brain component/start)]
-      (stubbing [car/set (fn [& _] (throw (Exception. "test exception")))
-                 car/get (fn [& _] (throw (Exception. "test exception")))]
-        (is (nil?  ((:set brain) "foo" "bar")))
-        (is (nil?  ((:get brain) "foo")))))))
+      (stubbing [car/set (fn [& _] (throw (Exception. "test")))
+                 error*  "OK"]
+        (is (= "OK" ((:set brain) "foo" "bar"))))
+
+      (stubbing [car/get (fn [& _] (throw (Exception. "test")))
+                 error*  "bar"]
+        (is (= "bar" ((:get brain) "foo"))))
+
+      (stubbing [car/keys (fn [& _] (throw (Exception. "test")))
+                 error*   ["foo"]]
+        (is (= ["foo"] ((:keys brain))))))))
