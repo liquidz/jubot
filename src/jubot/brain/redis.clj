@@ -10,19 +10,31 @@
        :doc "Default redis URI."}
   DEFAULT_REDIS_URI "redis://localhost:6379/")
 
+(defn error*
+  "DO NOT USE THIS FUNCTION DIRECTLY
+   DI for timbre/error"
+  [e] (timbre/error e))
+
 (defn- set-to-redis
   [conn k v]
   (try
     (car/wcar conn (car/set k v))
     (catch Exception e
-      (timbre/error e))))
+      (error* e))))
 
 (defn- get-from-redis
   [conn k]
   (try
     (car/wcar conn (car/get k))
     (catch Exception e
-      (timbre/error e))))
+      (error* e))))
+
+(defn- keys-from-redis
+  [conn]
+  (try
+    (car/wcar conn (car/keys "*"))
+    (catch Exception e
+      (error* e))))
 
 (defrecord RedisBrain [conn uri]
   component/Lifecycle
@@ -36,8 +48,9 @@
         (println ";; start redis brain. redis url is" (-> conn :spec :uri))
         (assoc this
                :conn conn
-               :set (partial set-to-redis conn)
-               :get (partial get-from-redis conn)))))
+               :set  (partial set-to-redis conn)
+               :get  (partial get-from-redis conn)
+               :keys (partial keys-from-redis conn)))))
   (stop [this]
     (if-not conn
       this

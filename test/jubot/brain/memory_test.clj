@@ -23,7 +23,8 @@
            :get)
       (is (= brain (component/stop brain)))))
 
-  (testing "set/get"
+  (testing "set/get/keys"
     (let [brain (component/start brain)]
       (is (= {"foo" "bar"} ((:set brain) "foo" "bar")))
-      (is (= "bar"         ((:get brain) "foo"))))))
+      (is (= "bar"         ((:get brain) "foo")))
+      (is (= ["foo"]       ((:keys brain)))))))

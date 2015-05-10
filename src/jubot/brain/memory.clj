@@ -11,6 +11,10 @@
   [{mem :mem} k]
   (get @mem k))
 
+(defn- keys-from-memory
+  [{mem :mem}]
+  (keys @mem))
+
 (defrecord MemoryBrain [mem]
   component/Lifecycle
   (start [this]
@@ -19,8 +23,9 @@
       (do (println ";; start memory brain")
           (let [this (assoc this :mem (atom {}))]
             (assoc this
-                   :set (partial set-to-memory this)
-                   :get (partial get-from-memory this))))))
+                   :set  (partial set-to-memory this)
+                   :get  (partial get-from-memory this)
+                   :keys (partial keys-from-memory this))))))
   (stop [this]
     (if-not mem
       this

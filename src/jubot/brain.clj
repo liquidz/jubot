@@ -4,7 +4,7 @@
     [jubot.system       :refer [system]]
     [jubot.brain.memory :refer [map->MemoryBrain]]
     [jubot.brain.redis  :refer [map->RedisBrain]])
-  (:refer-clojure :exclude [set get]))
+  (:refer-clojure :exclude [set get keys]))
 
 (defn create-brain
   "Create the specified brain.
@@ -42,3 +42,13 @@
   "
   [k]
   (some-> system :brain :get (as-> f (f k))))
+
+(defn keys
+  "Get key list from system brain.
+  Before using this function, jubot.system should be started.
+
+  Return
+    Key list.
+  "
+  []
+  (some-> system :brain :keys (as-> f (f))))
