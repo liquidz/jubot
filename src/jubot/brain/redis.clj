@@ -10,7 +10,10 @@
        :doc "Default redis URI."}
   DEFAULT_REDIS_URI "redis://localhost:6379/")
 
-(defn error* [e] (timbre/error e))
+(defn error*
+  "DO NOT USE THIS FUNCTION DIRECTLY
+   DI for timbre/error"
+  [e] (timbre/error e))
 
 (defn- set-to-redis
   [conn k v]
